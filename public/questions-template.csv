@@ -1,0 +1,4 @@
+balloonNumber,category,difficulty,question,optionA,optionB,optionC,optionD,correctOption,explanation,image,timeLimit
+1,Personal Safety,Easy,What should you do before starting an unfamiliar task?,Begin immediately,Carry out the required risk assessment,Ask someone else to do it,Ignore the procedure,B,The hazards and required controls should be understood before work begins.,,30
+2,PPE,Easy,When must you wear the PPE specified for a work area?,Only when a supervisor is watching,Only during audits,At all times while in that area,Only if it is comfortable,C,PPE requirements apply at all times in designated areas.,,30
+3,Fire Safety,Medium,Which type of fire should never be tackled with water?,Wood fire,Paper fire,Electrical or oil fire,Cloth fire,C,Water conducts electricity and spreads burning oil.,,30

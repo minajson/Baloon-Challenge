@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  /* Renaissance-inspired event palette (light, premium, corporate) */
+  --color-ren-orange: #f26522;
+  --color-ren-orange-deep: #d9531a;
+  --color-ren-orange-soft: #fdeee4;
+  --color-ren-navy: #0e2a4d;
+  --color-ren-navy-mid: #1d4570;
+  --color-ren-navy-soft: #e8eef6;
+  --color-safety-green: #148a4a;
+  --color-safety-green-soft: #e3f4ea;
+  --color-warm-yellow: #ffc845;
+  --color-warm-yellow-soft: #fff6de;
+  --color-alert-red: #d63b2f;
+  --color-alert-red-soft: #fcebe9;
+  --color-cream: #faf9f6;
+
+  --shadow-panel: 0 10px 30px -12px rgb(14 42 77 / 0.18);
+  --shadow-balloon: 0 14px 22px -12px rgb(14 42 77 / 0.35);
+}
+
+html,
+body {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  background: linear-gradient(180deg, #fdfcfa 0%, #f4f0ea 55%, #fdeee4 100%);
+  color: var(--color-ren-navy);
+  font-family:
+    "Avenir Next", "Segoe UI", system-ui, -apple-system, "Helvetica Neue",
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Gentle idle float for balloons */
+@keyframes balloon-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.2deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(1.2deg);
+  }
+}
+
+@keyframes timer-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Strong, projector-friendly focus states */
+:focus-visible {
+  outline: 4px solid var(--color-warm-yellow);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: var(--color-warm-yellow);
+  color: var(--color-ren-navy);
+}
