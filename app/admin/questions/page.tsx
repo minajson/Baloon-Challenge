@@ -264,6 +264,7 @@ export default function QuestionManagerPage() {
           </div>
           <Link
             href="/"
+            prefetch={false}
             className="rounded-xl bg-ren-navy px-4 py-2 font-black text-white hover:bg-ren-navy-mid"
           >
             ← Back to Game

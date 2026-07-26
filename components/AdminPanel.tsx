@@ -233,8 +233,12 @@ export default function AdminPanel(props: AdminPanelProps) {
             {/* Questions */}
             <Section title="Questions">
               <div className="flex flex-wrap items-center gap-2">
+                {/* prefetch={false}: fetch the route payload at click time so
+                    a redeploy between page load and click can't leave a stale
+                    prefetched payload that breaks the navigation. */}
                 <Link
                   href="/admin/questions"
+                  prefetch={false}
                   className="rounded-xl bg-ren-orange px-4 py-2 font-black text-white hover:bg-ren-orange-deep"
                 >
                   ✎ Manage Questions
