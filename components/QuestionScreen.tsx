@@ -124,7 +124,7 @@ export default function QuestionScreen({
       className="flex min-h-0 flex-1 flex-col px-4 pb-4 lg:px-8"
     >
       <div
-        className={`flex min-h-0 w-full flex-1 flex-col rounded-3xl bg-white p-4 shadow-panel transition-all duration-300 lg:p-7 2xl:p-10 ${
+        className={`question-card flex min-h-0 w-full flex-1 flex-col rounded-3xl bg-white shadow-panel transition-all duration-300 ${
           avatarActive ? "lg:w-[74%]" : "mx-auto max-w-[2400px]"
         }`}
       >
@@ -153,10 +153,7 @@ export default function QuestionScreen({
         </div>
 
         {/* Question */}
-        <h2
-          className="mt-3 text-balance font-black leading-snug text-ren-navy lg:mt-5"
-          style={{ fontSize: "clamp(30px, 3.4vw, 68px)", lineHeight: 1.2 }}
-        >
+        <h2 className="question-text mt-3 text-balance font-black text-ren-navy lg:mt-5">
           {question.question}
         </h2>
 
@@ -170,7 +167,7 @@ export default function QuestionScreen({
         )}
 
         {/* Answers */}
-        <div className="mt-4 grid flex-1 grid-cols-1 content-center gap-3 md:grid-cols-2 lg:mt-6 lg:gap-4">
+        <div className="answer-grid mt-4 flex-1 content-center lg:mt-6">
           {question.options.map((opt, i) => {
             const isCorrect = i === question.correctAnswerIndex;
             const isSelected = selected === i;
@@ -202,27 +199,22 @@ export default function QuestionScreen({
                 type="button"
                 disabled={locked || struck || paused}
                 onClick={() => handleSelect(i)}
-                className={`flex items-center gap-4 rounded-2xl border-4 p-3 text-left transition lg:p-4 ${styles}`}
-                style={{ minHeight: "clamp(64px, 8vh, 110px)" }}
+                className={`answer-btn flex items-center gap-4 rounded-2xl border-4 text-left transition ${styles}`}
               >
                 <span
                   className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl font-black lg:h-14 lg:w-14 lg:text-2xl ${badge}`}
                 >
                   {icon === "check" ? "✓" : icon === "cross" ? "✕" : LETTERS[i]}
                 </span>
-                <span
-                  className="font-bold leading-snug"
-                  style={{ fontSize: "clamp(18px, 1.5vw, 30px)" }}
-                >
-                  {opt}
-                </span>
+                <span className="answer-text font-bold leading-snug">{opt}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Explanation + Next */}
-        <div className="mt-3 flex min-h-[76px] items-center gap-4 lg:mt-4">
+        {/* Explanation + Next — sticky inside the scrollable card so the
+            Next Participant button can never be clipped out of view. */}
+        <div className="result-actions mt-3 flex min-h-[76px] items-center gap-4 lg:mt-4">
           {resolved && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -255,11 +247,7 @@ export default function QuestionScreen({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               onClick={onNext}
-              className="ml-auto shrink-0 rounded-2xl bg-ren-orange px-6 font-black text-white shadow-panel transition hover:scale-105 hover:bg-ren-orange-deep lg:px-8"
-              style={{
-                fontSize: "clamp(18px, 1.4vw, 28px)",
-                minHeight: "clamp(52px, 6vh, 76px)",
-              }}
+              className="next-btn ml-auto shrink-0 rounded-2xl bg-ren-orange px-6 font-black text-white shadow-panel transition hover:scale-105 hover:bg-ren-orange-deep lg:px-8"
             >
               Next Participant →
             </motion.button>

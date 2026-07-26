@@ -20,19 +20,229 @@
   --shadow-balloon: 0 14px 22px -12px rgb(14 42 77 / 0.35);
 }
 
+/* ------------------------------------------------------------------ */
+/* Responsive application shell — plain, UN-LAYERED CSS on purpose.    */
+/*                                                                     */
+/* These rules carry the load-bearing layout (shell, header, balloon   */
+/* grid, question card). Being outside @layer they (a) override the    */
+/* Tailwind utilities they replace in modern browsers and (b) still    */
+/* apply in older browsers where Tailwind v4's layered utilities drop  */
+/* entirely (Chrome < 111 / Safari < 16.4), so the game keeps a sane,  */
+/* in-viewport, scrollable layout instead of unstyled overflow.        */
+/* ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
-  height: 100%;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow-x: hidden;
   overscroll-behavior: none;
 }
 
 body {
+  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(180deg, #fdfcfa 0%, #f4f0ea 55%, #fdeee4 100%);
   color: var(--color-ren-navy);
   font-family:
     "Avenir Next", "Segoe UI", system-ui, -apple-system, "Helvetica Neue",
     Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* Root shell: header on top, game content filling the rest. */
+.game-app {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+}
+
+.game-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header: [Renaissance logo] [centred title] [SPE logo]. Grid keeps the
+   title truly centred; minmax(0, …) lets it shrink instead of overflow. */
+.game-header {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns:
+    minmax(80px, 0.8fr)
+    minmax(0, 2.4fr)
+    minmax(100px, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: clamp(64px, 9vh, 110px);
+  padding: clamp(8px, 1.2vw, 20px) clamp(12px, 2vw, 36px);
+  gap: clamp(8px, 1vw, 16px);
+}
+
+.game-header > :first-child {
+  justify-self: start;
+}
+
+.game-header > :last-child {
+  justify-self: end;
+}
+
+.game-header img {
+  max-height: clamp(38px, 5vh, 74px);
+  max-width: min(18vw, 230px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+.brand-title {
+  min-width: 0;
+  font-size: clamp(22px, 2.4vw, 52px);
+  line-height: 1;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+/* Opening screen: content block fits the viewport; scrolls only when the
+   window is genuinely too short (small windows, heavy zoom). */
+.opening-content {
+  width: min(94vw, 1500px);
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: clamp(8px, 1.5vh, 24px) clamp(8px, 1vw, 16px);
+}
+
+.hero-title {
+  font-size: clamp(36px, 6vw, 96px);
+  line-height: 0.95;
+}
+
+/* Balloon wall: the scroll region keeps header + stats always visible. */
+.balloon-wall-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.balloon-grid {
+  display: grid;
+  width: min(96vw, 1900px);
+  margin-inline: auto;
+  align-items: center;
+  justify-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(90px, 8vw, 150px), 1fr));
+  gap: clamp(10px, 1.2vw, 24px);
+  padding: clamp(8px, 1vw, 20px) clamp(12px, 2vw, 32px);
+}
+
+.balloon-grid > * {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 100 / 130;
+}
+
+/* Desktop / projector (the approved arrangement): fixed 10 × 5 field that
+   fits the available height with no scrolling — identical look to before. */
+@media (min-width: 1024px) and (min-height: 620px) {
+  .balloon-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+    gap: 0 clamp(8px, 0.9vw, 24px);
+    padding: 0 clamp(12px, 1.5vw, 32px) clamp(8px, 1vh, 16px);
+  }
+
+  .balloon-grid > * {
+    height: 100%;
+    max-height: 100%;
+    aspect-ratio: auto;
+  }
+}
+
+/* Very wide screens keep the previously approved wide balloon field
+   (centred, generous spacing) instead of clustering at 1900px. */
+@media (min-width: 2200px) {
+  .balloon-grid {
+    width: min(92vw, 3000px);
+  }
+}
+
+/* Question card: scrolls internally when the viewport is short so the
+   sticky action bar (explanation + Next Participant) is never clipped. */
+.question-card {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: clamp(14px, 2vw, 36px);
+}
+
+.question-text {
+  font-size: clamp(28px, 3vw, 64px);
+  line-height: 1.1;
+}
+
+.answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.4vw, 24px);
+}
+
+@media (max-width: 767px) {
+  .answer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.answer-btn {
+  min-height: clamp(58px, 8vh, 100px);
+  padding: clamp(12px, 1.5vw, 24px);
+}
+
+.answer-btn .answer-text {
+  font-size: clamp(17px, 1.5vw, 28px);
+}
+
+.result-actions {
+  position: sticky;
+  bottom: 0;
+  background: #ffffff;
+}
+
+.next-btn {
+  font-size: clamp(18px, 1.4vw, 28px);
+  min-height: clamp(52px, 6vh, 76px);
 }
 
 /* Gentle idle float for balloons */

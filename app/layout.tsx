@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="h-screen overflow-hidden antialiased">
+      <body className="antialiased">
         {children}
         <PwaStatus />
       </body>

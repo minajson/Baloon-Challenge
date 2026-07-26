@@ -26,22 +26,20 @@ export default function BalloonWall({
           {remaining} of {totalBalloons} balloons remaining
         </p>
       </div>
-      <div
-        role="group"
-        aria-label="Balloon wall"
-        className="mx-auto grid min-h-0 w-full max-w-[3000px] flex-1 grid-cols-10 grid-rows-5 place-items-center gap-x-3 gap-y-0 2xl:gap-x-6"
-      >
-        {Array.from({ length: totalBalloons }, (_, i) => i + 1).map((n, i) => (
-          <div key={n} className="h-full max-h-full w-full p-0.5">
-            <Balloon
-              number={n}
-              index={i}
-              popped={poppedSet.has(n)}
-              disabled={locked}
-              onPop={onPop}
-            />
-          </div>
-        ))}
+      <div className="balloon-wall-scroll">
+        <div role="group" aria-label="Balloon wall" className="balloon-grid">
+          {Array.from({ length: totalBalloons }, (_, i) => i + 1).map((n, i) => (
+            <div key={n} className="p-0.5">
+              <Balloon
+                number={n}
+                index={i}
+                popped={poppedSet.has(n)}
+                disabled={locked}
+                onPop={onPop}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

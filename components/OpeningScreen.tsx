@@ -89,9 +89,9 @@ export default function OpeningScreen({
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative z-10 flex flex-col items-center px-6 text-center"
+        className="opening-content relative z-10 flex flex-col items-center text-center"
       >
-        <h1 className="text-5xl font-black leading-[0.95] tracking-tight text-ren-navy md:text-6xl lg:text-7xl xl:text-8xl">
+        <h1 className="hero-title font-black tracking-tight text-ren-navy">
           POP THE <span className="text-ren-orange">BALLOON</span>
           <br />
           CHALLENGE

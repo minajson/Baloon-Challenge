@@ -88,6 +88,24 @@ export default function Confetti({
     }
   }, [fireSignal, intensity]);
 
+  // Track viewport changes (window resize, entering/leaving fullscreen) so
+  // a burst mid-resize still covers the whole visible area.
+  useEffect(() => {
+    const onResize = () => {
+      const canvas = canvasRef.current;
+      if (canvas && running.current) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    };
+    window.addEventListener("resize", onResize);
+    document.addEventListener("fullscreenchange", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      document.removeEventListener("fullscreenchange", onResize);
+    };
+  }, []);
+
   useEffect(() => {
     return () => cancelAnimationFrame(raf.current);
   }, []);

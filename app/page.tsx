@@ -296,16 +296,16 @@ export default function Game() {
 
   if (!hydrated) {
     return (
-      <main className="flex h-screen items-center justify-center">
+      <main className="game-app items-center justify-center">
         <p className="text-2xl font-black text-ren-navy">Loading…</p>
       </main>
     );
   }
 
   return (
-    <main className="relative flex h-screen w-full flex-col overflow-hidden">
+    <main className="game-app">
       <BrandHeader showTitle={screen !== "opening"} />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className="game-main">
         {screen === "opening" && (
           <OpeningScreen
             hasSavedGame={hasSavedGame}

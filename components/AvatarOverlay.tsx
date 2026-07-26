@@ -128,7 +128,9 @@ export default function AvatarOverlay({
           }}
           exit={{ x: 340, opacity: 0, transition: { duration: 0.3 } }}
           className="pointer-events-none fixed bottom-5 right-6 z-60 flex flex-col items-center"
-          style={{ width: "clamp(260px, 22vw, 460px)" }}
+          // 24vw stays clear of the question card (74% wide + margins) at
+          // every desktop width, so the mascot never covers an answer.
+          style={{ width: "clamp(180px, 24vw, 430px)" }}
         >
           <div className="relative w-full">
             {videoSrc ? (
@@ -144,7 +146,7 @@ export default function AvatarOverlay({
                   setTier((t) => (t === 0 && clip.fallbackFile ? 1 : 2))
                 }
                 // Contain, bottom-anchored: never crop the head, hands or face.
-                className="max-h-[68vh] w-full object-contain drop-shadow-2xl"
+                className="max-h-[62vh] w-full object-contain drop-shadow-2xl"
                 style={{ objectPosition: "center bottom" }}
               />
             ) : (
@@ -152,7 +154,7 @@ export default function AvatarOverlay({
               <img
                 src={MASTER_IMAGES[clip.gender]}
                 alt={`${clip.gender} safety ambassador`}
-                className="max-h-[68vh] w-full object-contain drop-shadow-2xl"
+                className="max-h-[62vh] w-full object-contain drop-shadow-2xl"
                 style={{ objectPosition: "center bottom" }}
               />
             )}
