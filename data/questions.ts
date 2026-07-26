@@ -1,13 +1,27 @@
-import type { Question } from "@/lib/types";
+import type { Difficulty } from "@/lib/types";
 
 /**
- * PLACEHOLDER QUESTION SET — 50 questions for the Pop the Balloon Challenge.
+ * DEFAULT QUESTION SET — 50 questions for the Pop the Balloon Challenge.
  *
- * Replace these with the official Renaissance Africa Energy Company questions
- * before the event, either by editing this file or by importing a CSV from the
- * Admin Panel (see /public/questions-template.csv and docs/REPLACING-QUESTIONS.md).
+ * These are the built-in defaults. Manage the live question bank from the
+ * Question Manager at /admin/questions (add, edit, delete, reorder, CSV
+ * import/export, restore defaults). This file is the "Restore Defaults"
+ * source and is normalised into the full question model by lib/questionStore.
  */
-export const QUESTIONS: Question[] = [
+export interface SeedQuestion {
+  id: number;
+  balloonNumber: number;
+  category: string;
+  difficulty: Difficulty;
+  question: string;
+  options: string[];
+  correctAnswerIndex: number;
+  explanation: string;
+  image: string | null;
+  timeLimit: number | null;
+}
+
+export const QUESTIONS: SeedQuestion[] = [
   {
     id: 1,
     balloonNumber: 1,

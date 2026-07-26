@@ -18,7 +18,11 @@ import {
   saveSettings,
   saveState,
 } from "@/lib/storage";
-import { activeQuestions, questionForBalloon } from "@/lib/questions";
+import {
+  activeQuestions,
+  assignedQuestion,
+  pickQuestionForBalloon,
+} from "@/lib/questions";
 import { allClipUrls, otherGender, pickClip, preloadTargets } from "@/lib/avatars";
 import { sound } from "@/lib/sound";
 import type { ResolveMethod } from "@/components/QuestionScreen";
@@ -29,7 +33,7 @@ import AvatarOverlay from "@/components/AvatarOverlay";
 import AdminPanel from "@/components/AdminPanel";
 import ResultsScreen from "@/components/ResultsScreen";
 import ScoreBar from "@/components/ScoreBar";
-import BrandPanel from "@/components/BrandPanel";
+import BrandHeader from "@/components/BrandHeader";
 import Confetti from "@/components/Confetti";
 
 const TOTAL_BALLOONS = 50;
@@ -112,13 +116,39 @@ export default function Game() {
     }
   }, [screen, warmClips]);
 
+  // Pick up admin question edits made in another tab (e.g. /admin/questions)
+  // without disturbing a question that is currently on screen.
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === "visible" && screen !== "question") {
+        setQuestions(activeQuestions());
+      }
+    };
+    window.addEventListener("visibilitychange", refresh);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.removeEventListener("visibilitychange", refresh);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [screen]);
+
   const paused = game.phase === "paused";
   const activeQuestion = useMemo(
     () =>
       activeBalloon !== null
-        ? questionForBalloon(questions, activeBalloon)
+        ? assignedQuestion(questions, game, activeBalloon)
         : undefined,
-    [activeBalloon, questions],
+    [activeBalloon, questions, game],
+  );
+
+  // A session ends when every balloon is used or the configured
+  // questions-per-session limit is reached (0 = no limit).
+  const sessionComplete = useCallback(
+    (g: GameState) =>
+      g.poppedBalloons.length >= TOTAL_BALLOONS ||
+      (settings.questionsPerSession > 0 &&
+        g.outcomes.length >= settings.questionsPerSession),
+    [settings.questionsPerSession],
   );
 
   const hasSavedGame =
@@ -138,20 +168,22 @@ export default function Game() {
 
   const resumeGame = useCallback(() => {
     setGame((g) => ({ ...g, phase: "running" }));
-    setScreen(
-      game.poppedBalloons.length >= TOTAL_BALLOONS ? "results" : "wall",
-    );
+    setScreen(sessionComplete(game) ? "results" : "wall");
     sound.preload();
-  }, [game.poppedBalloons.length]);
+  }, [game, sessionComplete]);
 
   const handlePop = useCallback(
     (n: number) => {
       if (paused) return;
       void sound.play("pop");
-      setGame((g) => ({ ...g, poppedBalloons: [...g.poppedBalloons, n] }));
-      const q = questionForBalloon(questions, n);
+      const q = pickQuestionForBalloon(questions, game, settings.questionMode, n);
+      setGame((g) => ({
+        ...g,
+        poppedBalloons: [...g.poppedBalloons, n],
+        assignments: q ? { ...g.assignments, [String(n)]: q.id } : g.assignments,
+      }));
       if (!q) {
-        setToast(`Balloon ${n} has no question linked — it was skipped.`);
+        setToast(`Balloon ${n} has no question available — it was skipped.`);
         window.setTimeout(() => setToast(null), 3500);
         return;
       }
@@ -163,12 +195,12 @@ export default function Game() {
         setScreen("question");
       }, 420);
     },
-    [paused, questions],
+    [paused, questions, game, settings.questionMode],
   );
 
   const handleResolve = useCallback(
     (correct: boolean, method: ResolveMethod) => {
-      if (!activeQuestion) return;
+      if (!activeQuestion || activeBalloon === null) return;
       setResolved({ correct, method });
       setGame((g) => ({
         ...g,
@@ -178,7 +210,7 @@ export default function Game() {
         outcomes: [
           ...g.outcomes,
           {
-            balloonNumber: activeQuestion.balloonNumber,
+            balloonNumber: activeBalloon,
             questionId: activeQuestion.id,
             category: activeQuestion.category,
             correct,
@@ -207,6 +239,7 @@ export default function Game() {
     },
     [
       activeQuestion,
+      activeBalloon,
       game.nextAvatar,
       game.outcomes.length,
       settings.avatarVideosEnabled,
@@ -215,7 +248,7 @@ export default function Game() {
   );
 
   const handleAvatarDone = useCallback(() => {
-    setAvatarClip(null);
+    // The mascot stays visible (held by the overlay) until Next Participant.
     setShowNext(true);
   }, []);
 
@@ -224,10 +257,8 @@ export default function Game() {
     setResolved(null);
     setShowNext(false);
     setAvatarClip(null);
-    setScreen(
-      game.poppedBalloons.length >= TOTAL_BALLOONS ? "results" : "wall",
-    );
-  }, [game.poppedBalloons.length]);
+    setScreen(sessionComplete(game) ? "results" : "wall");
+  }, [game, sessionComplete]);
 
   const handleSkipQuestion = useCallback(() => {
     // Damaged question: balloon stays used but no score is recorded.
@@ -236,10 +267,8 @@ export default function Game() {
     setShowNext(false);
     setAvatarClip(null);
     setShowAdmin(false);
-    setScreen(
-      game.poppedBalloons.length >= TOTAL_BALLOONS ? "results" : "wall",
-    );
-  }, [game.poppedBalloons.length]);
+    setScreen(sessionComplete(game) ? "results" : "wall");
+  }, [game, sessionComplete]);
 
   const resetGame = useCallback(() => {
     clearState();
@@ -274,8 +303,8 @@ export default function Game() {
   }
 
   return (
-    <main className="relative flex h-screen flex-col overflow-hidden">
-      {screen !== "opening" && screen !== "results" && <BrandPanel />}
+    <main className="relative flex h-screen w-full flex-col overflow-hidden">
+      <BrandHeader showTitle={screen !== "opening"} />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         {screen === "opening" && (
           <OpeningScreen
@@ -303,10 +332,11 @@ export default function Game() {
                 locked={paused || game.phase === "idle"}
                 onPop={handlePop}
               />
-            ) : activeQuestion ? (
+            ) : activeQuestion && activeBalloon !== null ? (
               <QuestionScreen
-                key={activeQuestion.balloonNumber}
+                key={activeBalloon}
                 question={activeQuestion}
+                balloonNumber={activeBalloon}
                 timerEnabled={settings.timerEnabled}
                 timerDuration={settings.timerDuration}
                 secondAttemptMode={settings.secondAttemptMode}
@@ -337,7 +367,12 @@ export default function Game() {
 
       {/* Character reaction overlay */}
       {avatarClip && (
-        <AvatarOverlay clip={avatarClip} onDone={handleAvatarDone} allowSkip />
+        <AvatarOverlay
+          clip={avatarClip}
+          onDone={handleAvatarDone}
+          allowSkip
+          holdOnDone
+        />
       )}
       {previewClip && (
         <AvatarOverlay
@@ -385,7 +420,6 @@ export default function Game() {
             setShowAdmin(false);
             handleNext();
           }}
-          onQuestionsImported={() => setQuestions(activeQuestions())}
         />
       )}
     </main>

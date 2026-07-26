@@ -2,12 +2,12 @@
 
 ## Event branding
 
-The game uses a text event mark — **RENAISSANCE PEOPLE DAY** (green) — shown
-at the top of the opening and results screens and as a slim identifier on
-the left edge during gameplay. There is no image logo. To add an official
-logo later, drop it into a screen component (e.g. `OpeningScreen.tsx` /
-`ResultsScreen.tsx`) next to the RENAISSANCE PEOPLE DAY text. Do not redraw
-or recreate the official logo.
+Branding lives in `components/BrandHeader.tsx`: the Renaissance logo
+(`public/media/images/renaissance-logo.png`) on the left, the centred game
+title, and the SPE International logo (`public/media/images/spe_logo.png`)
+on the right. To swap a logo, overwrite the PNG (same path) — the header
+preserves each logo's aspect ratio (`object-fit: contain`), so any
+reasonable size works. Do not redraw or recreate the official logos.
 
 ## Avatar reaction videos
 
@@ -35,7 +35,7 @@ To add/rename clips or transparent `.webm` versions, also update
   "file": "/media/avatars/male/male_correct_01.webm",   // transparent webm or null
   "fallbackFile": "/media/avatars/male/male_correct_01.mp4",
   "audioFile": "/media/audio/male_correct.wav",
-  "dialogue": "Good job! Run am safe!",
+  "dialogue": "Good job! Well done!",
   "durationSec": 4,
   "hasTransparency": false
 }
@@ -78,9 +78,9 @@ coverall, same green RENAISSANCE wordmark.
 
 ## Dialogue lines (fixed)
 
-- Correct: **“Good job! Run am safe!”**
-- Wrong: **“Oh-oh! Please try again next time, but still run am safe o!”**
-- Final: **“Well done, everyone! Remember to always run am safe!”**
+- Correct: **“Good job! Well done!”**
+- Wrong: **“Oh-oh! Please try again next time!”**
+- Final: **“Well done, everyone! Remember to always stay safe!”**
 
 Subtitles are rendered from `data/avatar-manifest.json` — if you change a
 recorded line, update its `dialogue` string so subtitles match.

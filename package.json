@@ -1,8 +1,8 @@
 {
-  "name": "run-am-safe-balloon-challenge",
+  "name": "pop-the-balloon-challenge",
   "version": "1.0.0",
   "private": true,
-  "description": "RUN AM SAFE — Balloon Safety Challenge for Renaissance Africa Energy Company safety events",
+  "description": "Pop the Balloon Challenge — interactive balloon safety game for live events",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -23,8 +23,16 @@ function Stat({
     <div
       className={`flex items-baseline gap-2 rounded-xl px-3 py-1.5 ${tones[tone]}`}
     >
-      <span className="text-xl font-black tabular-nums lg:text-2xl">{value}</span>
-      <span className="text-[11px] font-bold uppercase tracking-wide opacity-80 lg:text-xs">
+      <span
+        className="font-black tabular-nums"
+        style={{ fontSize: "clamp(16px, 1.2vw, 26px)" }}
+      >
+        {value}
+      </span>
+      <span
+        className="font-bold uppercase tracking-wide opacity-80"
+        style={{ fontSize: "clamp(10px, 0.7vw, 14px)" }}
+      >
         {label}
       </span>
     </div>
@@ -48,16 +56,14 @@ export default function ScoreBar({
 }) {
   const remaining = totalBalloons - state.poppedBalloons.length;
   return (
-    <header className="flex items-center justify-between gap-4 px-4 py-2 lg:pl-32 lg:pr-6">
-      <div className="flex items-center gap-4">
-        <div className="flex flex-col leading-tight">
-          <span className="text-lg font-black tracking-tight text-ren-navy lg:text-2xl">
-            POP THE BALLOON <span className="text-ren-orange">CHALLENGE</span>
-          </span>
-          <span className="hidden text-[11px] font-semibold uppercase tracking-widest text-safety-green md:block">
-            Pick a balloon. Answer the question.
-          </span>
-        </div>
+    <div className="flex items-center justify-between gap-4 px-4 py-1.5 lg:px-8">
+      <div className="flex items-center gap-3">
+        <span
+          className="hidden font-semibold uppercase tracking-widest text-safety-green md:block"
+          style={{ fontSize: "clamp(11px, 0.8vw, 15px)" }}
+        >
+          Pick a balloon. Answer the question.
+        </span>
         {paused && (
           <span className="rounded-full bg-warm-yellow px-3 py-1 text-sm font-black text-ren-navy">
             PAUSED
@@ -100,6 +106,6 @@ export default function ScoreBar({
           </svg>
         </button>
       </div>
-    </header>
+    </div>
   );
 }

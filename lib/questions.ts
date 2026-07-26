@@ -1,17 +1,56 @@
-import { QUESTIONS } from "@/data/questions";
-import { loadCustomQuestions } from "./storage";
-import type { CategoryStat, GameState, Question } from "./types";
+import { loadQuestionBank, sortByOrder } from "./questionStore";
+import type {
+  CategoryStat,
+  GameState,
+  Question,
+  QuestionMode,
+} from "./types";
 
-/** The active question set: CSV-imported custom set if present, else bundled. */
+/** The playable pool: active questions from the managed bank, in order. */
 export function activeQuestions(): Question[] {
-  return loadCustomQuestions() ?? QUESTIONS;
+  return sortByOrder(loadQuestionBank().filter((q) => q.active));
 }
 
-export function questionForBalloon(
+/**
+ * Resolve the question already assigned to a balloon in this session.
+ * Assignments are recorded in GameState so a refresh restores them and a
+ * question can never be served twice in one session.
+ */
+export function assignedQuestion(
   questions: Question[],
+  state: GameState,
   balloonNumber: number,
 ): Question | undefined {
-  return questions.find((q) => q.balloonNumber === balloonNumber);
+  const id = state.assignments[String(balloonNumber)];
+  return id ? questions.find((q) => q.id === id) : undefined;
+}
+
+/**
+ * Pick the question for a freshly popped balloon according to the question
+ * mode. Returns undefined when no unused question is available.
+ *
+ * - fixed:      the question whose balloonNumber matches the balloon.
+ * - sequential: the next unused question by display order.
+ * - random:     a random unused question.
+ */
+export function pickQuestionForBalloon(
+  questions: Question[],
+  state: GameState,
+  mode: QuestionMode,
+  balloonNumber: number,
+): Question | undefined {
+  const existing = assignedQuestion(questions, state, balloonNumber);
+  if (existing) return existing;
+  const usedIds = new Set(Object.values(state.assignments));
+  const unused = questions.filter((q) => !usedIds.has(q.id));
+  if (mode === "fixed") {
+    return unused.find((q) => q.balloonNumber === balloonNumber);
+  }
+  if (mode === "sequential") {
+    return unused[0];
+  }
+  if (unused.length === 0) return undefined;
+  return unused[Math.floor(Math.random() * unused.length)];
 }
 
 export function categoryStats(

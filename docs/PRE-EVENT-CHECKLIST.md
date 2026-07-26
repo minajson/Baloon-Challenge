@@ -23,10 +23,9 @@ day before.
 
 - [ ] Sound Test button: pop, cheer and fanfare audible through the PA.
 - [ ] Correct answer → cheerful sound + confetti + mascot clip
-      (“Good job! Run am safe!”).
+      (“Good job! Well done!”).
 - [ ] Wrong answer → gentle sound, correct answer highlighted after a
-      pause, mascot clip (“Oh-oh! Please try again next time, but still run
-      am safe o!”).
+      pause, mascot clip (“Oh-oh! Please try again next time!”).
 - [ ] Subtitles match the spoken dialogue.
 - [ ] Male and female mascots alternate between questions.
 - [ ] No overlapping audio when clicking quickly (interaction locks while a
@@ -42,7 +41,7 @@ day before.
 - [ ] Timer counts down, pulses and beeps softly in the last 5 seconds;
       timeout is handled as a wrong answer.
 - [ ] Timer can be disabled in Admin.
-- [ ] Admin PIN works; Mark Correct / Mark Incorrect / Skip Damaged
+- [ ] Admin panel opens directly (no PIN); Mark Correct / Mark Incorrect / Skip Damaged
       Question work on a live question.
 - [ ] Reset Game asks for confirmation and restores all 50 balloons.
 - [ ] After balloon 50, the results screen appears with totals, accuracy,

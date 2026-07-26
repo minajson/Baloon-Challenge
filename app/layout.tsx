@@ -1,10 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import PwaStatus from "@/components/PwaStatus";
 
 export const metadata: Metadata = {
-  title: "POP THE BALLOON CHALLENGE — Renaissance People Day",
+  title: "POP THE BALLOON CHALLENGE",
   description:
-    "Renaissance Africa Energy Company interactive balloon safety challenge for live safety events.",
+    "Interactive balloon safety challenge for live events — pop a balloon, answer the question.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/media/images/renaissance-logo.png",
+    apple: "/media/images/renaissance-logo.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -19,7 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="h-screen overflow-hidden antialiased">{children}</body>
+      <body className="h-screen overflow-hidden antialiased">
+        {children}
+        <PwaStatus />
+      </body>
     </html>
   );
 }

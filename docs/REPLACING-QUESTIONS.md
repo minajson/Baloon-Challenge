@@ -1,44 +1,56 @@
-# Replacing the 50 Placeholder Questions
+# Managing the Questions
 
-The shipped questions in `data/questions.ts` are **placeholders**. Replace
-them with the approved Renaissance question set in either of two ways.
+The bundled questions in `data/questions.ts` are the **defaults**. Manage
+the live question bank in the **Question Manager** — open **⚙ Admin →
+Manage Questions**, or go straight to `/admin/questions` (no PIN or
+password).
 
-## Option A — CSV import (no code, recommended for event teams)
+## Option A — Question Manager (no code, recommended for event teams)
 
-1. Open `public/questions-template.csv` in Excel or Google Sheets.
-2. Fill one row per balloon with these columns:
+The manager supports adding, editing, duplicating, deleting (with
+confirmation), enabling/disabling, reordering (drag-and-drop, move up/down
+or manual order numbers), balloon assignment, question preview, images with
+alt text, CSV import/export and Restore Defaults. Changes are stored in the
+browser's localStorage and survive restarts **on that machine**.
+
+### CSV import
+
+1. Open `public/questions-template.csv` (or use **Export CSV** to start
+   from the current bank) in Excel or Google Sheets.
+2. Fill one row per question with these columns:
 
    | Column | Meaning |
    | --- | --- |
-   | `balloonNumber` | 1–50, unique |
+   | `id` | Optional stable id (e.g. `question-001`); empty = auto-generated. Rows matching an existing id update it only when “update existing” is ticked. |
+   | `order` | Display/play order (1, 2, 3…) |
+   | `balloonNumber` | Optional 1–50, unique among active questions (used by fixed mode) |
+   | `question` | The question text (required) |
+   | `optionA`–`optionD` | Answer options (C and D may be left empty) |
+   | `correctAnswer` | A, B, C or D (1–4 also accepted) |
+   | `explanation` | Optional explanation shown after answering |
    | `category` | e.g. Personal Safety, PPE, Fire Safety… |
    | `difficulty` | Easy, Medium or Hard |
-   | `question` | The question text |
-   | `optionA`–`optionD` | Answer options (D may be left empty for 3-option questions) |
-   | `correctOption` | A, B, C or D |
-   | `explanation` | One-sentence explanation shown after answering |
+   | `active` | true/false — inactive questions are excluded from play |
    | `image` | Optional image path (put files in `public/media/images/`) or empty |
-   | `timeLimit` | Optional seconds override, or empty for the global timer |
 
-3. Export/save as **CSV**.
-4. In the game: **⚙ Admin → Questions → Import Questions (CSV)**.
-5. The imported set is stored in the browser's localStorage and survives
-   restarts **on that machine**. “Restore Default Questions” returns to the
-   bundled set.
+3. Export/save as **CSV**, then **Import CSV** in the Question Manager.
+4. The import summary reports imported / updated / skipped rows and lists
+   every invalid row — nothing invalid is imported silently.
 
 Notes:
 - Wrap any text containing commas in double quotes (spreadsheets do this
   automatically on export).
-- If fewer than 50 valid rows are imported, balloons without questions are
-  skipped gracefully when popped (and the admin sees a notice).
+- In fixed mode, balloons without an assigned question are skipped
+  gracefully when popped (and the admin sees a notice). Sequential and
+  random modes ignore fixed balloon assignments.
 
-## Option B — edit the source (permanent, survives on every machine)
+## Option B — edit the defaults (permanent, survives on every machine)
 
-Edit `data/questions.ts` and change the entries directly. Each question is:
+Edit `data/questions.ts` and change the entries directly. Each seed entry is:
 
 ```ts
 {
-  id: 1,
+  id: 1,                          // becomes "question-001"
   balloonNumber: 1,
   category: "Personal Safety",
   difficulty: "Easy",
@@ -51,4 +63,5 @@ Edit `data/questions.ts` and change the entries directly. Each question is:
 }
 ```
 
-Then rebuild: `npm run build`.
+Then rebuild: `npm run build`. Machines that already customised their bank
+keep their localStorage copy until **Restore Defaults** is used.

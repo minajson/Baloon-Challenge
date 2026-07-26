@@ -26,15 +26,23 @@ export default function AvatarOverlay({
   clip,
   onDone,
   allowSkip,
+  holdOnDone = false,
 }: {
   clip: AvatarClip;
   onDone: () => void;
   allowSkip: boolean;
+  /**
+   * Keep the mascot on screen after the clip finishes (facilitator flow:
+   * the mascot stays until Next Participant is clicked and the parent
+   * unmounts the overlay). Without it the overlay slides out on its own.
+   */
+  holdOnDone?: boolean;
 }) {
   // tier 0: webm, 1: mp4, 2: master image (audio still plays), 3: image + text
   const initialTier = clip.file ? 0 : clip.fallbackFile ? 1 : 2;
   const [tier, setTier] = useState(initialTier);
   const [leaving, setLeaving] = useState(false);
+  const [held, setHeld] = useState(false);
   const doneRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -44,13 +52,20 @@ export default function AvatarOverlay({
   const finish = useCallback(() => {
     if (doneRef.current) return;
     doneRef.current = true;
-    setLeaving(true);
     audioRef.current?.pause();
     sound.unduck();
     if (safetyRef.current) window.clearTimeout(safetyRef.current);
     if (textTimerRef.current) window.clearTimeout(textTimerRef.current);
+    if (holdOnDone) {
+      // Stay on screen (last frame / master image) until the parent
+      // unmounts the overlay on Next Participant.
+      setHeld(true);
+      onDone();
+      return;
+    }
+    setLeaving(true);
     window.setTimeout(onDone, 320);
-  }, [onDone]);
+  }, [onDone, holdOnDone]);
 
   // Standalone audio is the source of truth — start it once, drive `finish`
   // off it when present. Duck the background music for the whole reaction.
@@ -113,7 +128,7 @@ export default function AvatarOverlay({
           }}
           exit={{ x: 340, opacity: 0, transition: { duration: 0.3 } }}
           className="pointer-events-none fixed bottom-5 right-6 z-60 flex flex-col items-center"
-          style={{ width: "clamp(260px, 22vw, 420px)" }}
+          style={{ width: "clamp(260px, 22vw, 460px)" }}
         >
           <div className="relative w-full">
             {videoSrc ? (
@@ -141,7 +156,7 @@ export default function AvatarOverlay({
                 style={{ objectPosition: "center bottom" }}
               />
             )}
-            {allowSkip && (
+            {allowSkip && !held && (
               <button
                 type="button"
                 onClick={finish}

@@ -6,7 +6,7 @@
    folder after `npm run build`).
 2. Press **Full Screen** on the opening screen (or F11 in most browsers).
 3. Press **Sound Test** and confirm pop / cheer / fanfare through the PA.
-4. Open **⚙ Admin** (PIN `1234` unless you changed it) and set:
+4. Open **⚙ Admin** (no PIN required) and set:
    - Timer on/off and duration (default 30 s),
    - Sound, confetti, avatar videos, background music,
    - Starting avatar (male or female).
@@ -41,7 +41,7 @@
 
 - The results screen appears automatically: totals, accuracy and the
   strongest / needs-more-awareness safety categories, plus both mascots’
-  final message: *“Well done, everyone! Remember to always run am safe!”*
+  final message: *“Well done, everyone! Remember to always stay safe!”*
 - Press **Export Results** to download a CSV (per-balloon outcomes) and a
   JSON summary.
 - **Restart Game** resets all 50 balloons for another session (a

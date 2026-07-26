@@ -1,11 +1,19 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import type { AvatarGender, GamePhase, GameSettings, GameState } from "@/lib/types";
-import { importQuestionsCsv, exportResultsCsv, downloadFile } from "@/lib/csv";
-import { saveCustomQuestions, clearCustomQuestions } from "@/lib/storage";
+import { exportResultsCsv, downloadFile } from "@/lib/csv";
 import { accuracyPercent } from "@/lib/questions";
+
+/**
+ * Authentication is intentionally disabled: the facilitator panel and the
+ * question manager open directly, with no PIN or password. To reinstate a
+ * gate later, flip this flag and re-add a check against settings.adminPin
+ * before rendering the panel body.
+ */
+const ADMIN_AUTH_ENABLED = false;
 
 interface AdminPanelProps {
   settings: GameSettings;
@@ -24,7 +32,6 @@ interface AdminPanelProps {
   onMarkAnswer: (correct: boolean) => void;
   onSkipQuestion: () => void;
   onReturnToWall: () => void;
-  onQuestionsImported: (count: number) => void;
 }
 
 export default function AdminPanel(props: AdminPanelProps) {
@@ -37,37 +44,9 @@ export default function AdminPanel(props: AdminPanelProps) {
     onClose,
     onSettingsChange,
   } = props;
-  const [unlocked, setUnlocked] = useState(settings.adminPin === "");
-  const [pinInput, setPinInput] = useState("");
-  const [pinError, setPinError] = useState(false);
   const [confirmReset, setConfirmReset] = useState<null | "game" | "score">(null);
-  const [importMessage, setImportMessage] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const tryUnlock = () => {
-    if (pinInput === settings.adminPin) {
-      setUnlocked(true);
-      setPinError(false);
-    } else {
-      setPinError(true);
-      setPinInput("");
-    }
-  };
-
-  const handleCsvFile = async (file: File) => {
-    const text = await file.text();
-    const { questions, errors } = importQuestionsCsv(text);
-    if (questions.length > 0) {
-      saveCustomQuestions(questions);
-      props.onQuestionsImported(questions.length);
-      setImportMessage(
-        `Imported ${questions.length} questions.${errors.length ? ` ${errors.length} row issue(s) — see console.` : ""}`,
-      );
-    } else {
-      setImportMessage(`Import failed: ${errors[0] ?? "no valid rows."}`);
-    }
-    if (errors.length) console.warn("CSV import issues:", errors);
-  };
+  // ADMIN_AUTH_ENABLED is the future re-entry point for a PIN gate.
+  const unlocked = !ADMIN_AUTH_ENABLED;
 
   const exportResults = () => {
     downloadFile("pop-the-balloon-results.csv", exportResultsCsv(state.outcomes));
@@ -106,33 +85,7 @@ export default function AdminPanel(props: AdminPanelProps) {
           </button>
         </div>
 
-        {!unlocked ? (
-          <div className="mt-6 flex flex-col items-center gap-4 py-8">
-            <p className="text-lg font-bold text-ren-navy">Enter admin PIN</p>
-            <input
-              type="password"
-              inputMode="numeric"
-              autoFocus
-              value={pinInput}
-              onChange={(e) => setPinInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
-              className={`w-44 rounded-xl border-4 px-4 py-3 text-center text-2xl font-black tracking-[0.4em] ${
-                pinError ? "border-alert-red" : "border-ren-navy-soft"
-              }`}
-              aria-label="Admin PIN"
-            />
-            {pinError && (
-              <p className="font-bold text-alert-red">Wrong PIN — try again.</p>
-            )}
-            <button
-              type="button"
-              onClick={tryUnlock}
-              className="rounded-xl bg-ren-orange px-6 py-3 text-lg font-black text-white hover:bg-ren-orange-deep"
-            >
-              Unlock
-            </button>
-          </div>
-        ) : (
+        {!unlocked ? null : (
           <div className="mt-4 space-y-5">
             {/* Game control */}
             <Section title="Game Control">
@@ -280,41 +233,17 @@ export default function AdminPanel(props: AdminPanelProps) {
             {/* Questions */}
             <Section title="Questions">
               <div className="flex flex-wrap items-center gap-2">
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept=".csv,text/csv"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) void handleCsvFile(f);
-                    e.target.value = "";
-                  }}
-                />
-                <AdminButton tone="navy" onClick={() => fileRef.current?.click()}>
-                  ⬆ Import Questions (CSV)
-                </AdminButton>
-                <AdminButton
-                  tone="navy"
-                  onClick={() => {
-                    clearCustomQuestions();
-                    props.onQuestionsImported(0);
-                    setImportMessage("Restored the built-in 50 questions.");
-                  }}
+                <Link
+                  href="/admin/questions"
+                  className="rounded-xl bg-ren-orange px-4 py-2 font-black text-white hover:bg-ren-orange-deep"
                 >
-                  ↺ Restore Default Questions
-                </AdminButton>
-                <a
-                  href="/questions-template.csv"
-                  download
-                  className="rounded-xl bg-ren-navy-soft px-4 py-2 font-black text-ren-navy hover:bg-ren-navy hover:text-white"
-                >
-                  ⬇ CSV Template
-                </a>
+                  ✎ Manage Questions
+                </Link>
               </div>
-              {importMessage && (
-                <p className="mt-2 font-bold text-safety-green">{importMessage}</p>
-              )}
+              <p className="mt-2 text-sm font-semibold text-ren-navy/70">
+                Add, edit, reorder, import/export and preview questions in the
+                Question Manager. Changes apply to new games.
+              </p>
             </Section>
 
             {/* Data */}
@@ -361,18 +290,6 @@ export default function AdminPanel(props: AdminPanelProps) {
               )}
             </Section>
 
-            {/* Security */}
-            <Section title="Admin PIN">
-              <label className="flex items-center gap-2 font-bold text-ren-navy">
-                PIN (empty = no PIN)
-                <input
-                  type="text"
-                  defaultValue={settings.adminPin}
-                  onBlur={(e) => onSettingsChange({ adminPin: e.target.value.trim() })}
-                  className="w-32 rounded-lg border-2 border-ren-navy-soft px-2 py-1 font-black tracking-widest"
-                />
-              </label>
-            </Section>
           </div>
         )}
       </motion.div>

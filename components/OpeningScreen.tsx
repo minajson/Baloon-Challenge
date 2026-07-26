@@ -91,10 +91,7 @@ export default function OpeningScreen({
         transition={{ duration: 0.5 }}
         className="relative z-10 flex flex-col items-center px-6 text-center"
       >
-        <p className="text-2xl font-black tracking-[0.3em] text-safety-green lg:text-3xl">
-          RENAISSANCE PEOPLE DAY
-        </p>
-        <h1 className="mt-3 text-5xl font-black leading-[0.95] tracking-tight text-ren-navy md:text-6xl lg:text-7xl xl:text-8xl">
+        <h1 className="text-5xl font-black leading-[0.95] tracking-tight text-ren-navy md:text-6xl lg:text-7xl xl:text-8xl">
           POP THE <span className="text-ren-orange">BALLOON</span>
           <br />
           CHALLENGE

@@ -12,6 +12,7 @@ export type ResolveMethod = "answered" | "timeout" | "admin-correct" | "admin-wr
 
 export default function QuestionScreen({
   question,
+  balloonNumber,
   timerEnabled,
   timerDuration,
   secondAttemptMode,
@@ -23,6 +24,8 @@ export default function QuestionScreen({
   onNext,
 }: {
   question: Question;
+  /** The popped balloon (may differ from question.balloonNumber in random/sequential modes). */
+  balloonNumber: number;
   timerEnabled: boolean;
   timerDuration: number;
   secondAttemptMode: boolean;
@@ -118,17 +121,17 @@ export default function QuestionScreen({
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.25 }}
-      className="flex min-h-0 flex-1 flex-col px-4 pb-4 lg:px-8 lg:pl-32"
+      className="flex min-h-0 flex-1 flex-col px-4 pb-4 lg:px-8"
     >
       <div
-        className={`flex min-h-0 w-full flex-1 flex-col rounded-3xl bg-white p-4 shadow-panel transition-all duration-300 lg:p-7 ${
-          avatarActive ? "lg:w-[72%]" : "mx-auto max-w-[1500px]"
+        className={`flex min-h-0 w-full flex-1 flex-col rounded-3xl bg-white p-4 shadow-panel transition-all duration-300 lg:p-7 2xl:p-10 ${
+          avatarActive ? "lg:w-[74%]" : "mx-auto max-w-[2400px]"
         }`}
       >
         {/* Header */}
         <div className="flex flex-wrap items-center gap-2 lg:gap-3">
           <span className="rounded-full bg-ren-orange px-4 py-1.5 text-base font-black text-white lg:text-lg">
-            Balloon {question.balloonNumber}
+            Balloon {balloonNumber}
           </span>
           <span className="rounded-full bg-ren-navy-soft px-4 py-1.5 text-base font-bold text-ren-navy lg:text-lg">
             {question.category}
@@ -150,7 +153,10 @@ export default function QuestionScreen({
         </div>
 
         {/* Question */}
-        <h2 className="mt-3 text-balance text-2xl font-black leading-snug text-ren-navy md:text-3xl lg:mt-5 lg:text-4xl xl:text-[2.6rem]">
+        <h2
+          className="mt-3 text-balance font-black leading-snug text-ren-navy lg:mt-5"
+          style={{ fontSize: "clamp(30px, 3.4vw, 68px)", lineHeight: 1.2 }}
+        >
           {question.question}
         </h2>
 
@@ -158,7 +164,7 @@ export default function QuestionScreen({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={question.image}
-            alt=""
+            alt={question.imageAlt ?? ""}
             className="mt-3 max-h-40 self-center rounded-xl object-contain"
           />
         )}
@@ -197,13 +203,17 @@ export default function QuestionScreen({
                 disabled={locked || struck || paused}
                 onClick={() => handleSelect(i)}
                 className={`flex items-center gap-4 rounded-2xl border-4 p-3 text-left transition lg:p-4 ${styles}`}
+                style={{ minHeight: "clamp(64px, 8vh, 110px)" }}
               >
                 <span
                   className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl font-black lg:h-14 lg:w-14 lg:text-2xl ${badge}`}
                 >
                   {icon === "check" ? "✓" : icon === "cross" ? "✕" : LETTERS[i]}
                 </span>
-                <span className="text-lg font-bold leading-snug md:text-xl lg:text-2xl">
+                <span
+                  className="font-bold leading-snug"
+                  style={{ fontSize: "clamp(18px, 1.5vw, 30px)" }}
+                >
                   {opt}
                 </span>
               </button>
@@ -245,7 +255,11 @@ export default function QuestionScreen({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               onClick={onNext}
-              className="ml-auto shrink-0 rounded-2xl bg-ren-orange px-6 py-4 text-xl font-black text-white shadow-panel transition hover:scale-105 hover:bg-ren-orange-deep lg:px-8 lg:text-2xl"
+              className="ml-auto shrink-0 rounded-2xl bg-ren-orange px-6 font-black text-white shadow-panel transition hover:scale-105 hover:bg-ren-orange-deep lg:px-8"
+              style={{
+                fontSize: "clamp(18px, 1.4vw, 28px)",
+                minHeight: "clamp(52px, 6vh, 76px)",
+              }}
             >
               Next Participant →
             </motion.button>

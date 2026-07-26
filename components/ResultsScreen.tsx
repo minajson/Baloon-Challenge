@@ -52,7 +52,7 @@ export default function ResultsScreen({
       exportResultsCsv(state.outcomes),
     );
     const summary = {
-      event: "Renaissance People Day — Pop the Balloon Challenge",
+      event: "Pop the Balloon Challenge",
       completedAt: new Date().toISOString(),
       totals: {
         correct: state.correctCount,
@@ -75,12 +75,9 @@ export default function ResultsScreen({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex w-full max-w-5xl flex-col items-center"
+        className="flex w-full max-w-[1500px] flex-col items-center"
       >
-        <p className="text-xl font-black tracking-[0.3em] text-safety-green lg:text-2xl">
-          RENAISSANCE PEOPLE DAY
-        </p>
-        <h1 className="mt-3 text-center text-4xl font-black tracking-tight text-ren-navy lg:text-6xl">
+        <h1 className="mt-2 text-center text-4xl font-black tracking-tight text-ren-navy lg:text-6xl">
           Pop the Balloon Challenge{" "}
           <span className="text-ren-orange">Complete!</span>
         </h1>

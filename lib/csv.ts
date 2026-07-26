@@ -1,4 +1,5 @@
 import type { Difficulty, Question } from "./types";
+import { nowIso } from "./questionStore";
 
 /**
  * Minimal CSV parser supporting quoted fields, embedded commas, quotes and
@@ -42,110 +43,196 @@ export function parseCsv(text: string): string[][] {
   return rows;
 }
 
-const HEADERS = [
+export const QUESTION_CSV_HEADERS = [
+  "id",
+  "order",
   "balloonNumber",
-  "category",
-  "difficulty",
   "question",
   "optionA",
   "optionB",
   "optionC",
   "optionD",
-  "correctOption",
+  "correctAnswer",
   "explanation",
+  "category",
+  "difficulty",
+  "active",
   "image",
-  "timeLimit",
 ] as const;
 
-export interface CsvImportResult {
+type CsvHeader = (typeof QUESTION_CSV_HEADERS)[number];
+
+export interface CsvImportSummary {
   questions: Question[];
+  imported: number;
+  updated: number;
+  skipped: number;
   errors: string[];
 }
 
 /**
- * Import questions from CSV text following /public/questions-template.csv.
- * Rows with problems are reported, valid rows are kept.
+ * Import questions from CSV into the existing bank.
+ *
+ * Rows with an id matching an existing question are updated only when
+ * `updateExisting` is true, otherwise they are skipped. Invalid rows are
+ * never imported silently — each problem is reported with its line number.
  */
-export function importQuestionsCsv(text: string): CsvImportResult {
+export function importQuestionBankCsv(
+  text: string,
+  existing: Question[],
+  updateExisting: boolean,
+): CsvImportSummary {
   const rows = parseCsv(text);
   const errors: string[] = [];
   if (rows.length < 2) {
-    return { questions: [], errors: ["CSV has no data rows."] };
+    return { questions: existing, imported: 0, updated: 0, skipped: 0, errors: ["CSV has no data rows."] };
   }
   const header = rows[0].map((h) => h.trim());
-  const idx = (name: (typeof HEADERS)[number]) => header.indexOf(name);
-  if (idx("balloonNumber") === -1 || idx("question") === -1) {
+  const idx = (name: CsvHeader) => header.indexOf(name);
+  const required: CsvHeader[] = ["question", "optionA", "optionB", "correctAnswer"];
+  const missingHeaders = required.filter((h) => idx(h) === -1);
+  if (missingHeaders.length > 0) {
     return {
-      questions: [],
+      questions: existing,
+      imported: 0,
+      updated: 0,
+      skipped: 0,
       errors: [
-        `Header row must contain the columns: ${HEADERS.join(", ")} (see questions-template.csv).`,
+        `Missing required column(s): ${missingHeaders.join(", ")}. Expected headers: ${QUESTION_CSV_HEADERS.join(", ")}.`,
       ],
     };
   }
 
-  const questions: Question[] = [];
+  const bank = [...existing];
+  const byId = new Map(bank.map((q) => [q.id, q] as const));
+  const seenIds = new Set<string>();
   const seenBalloons = new Set<number>();
+  let imported = 0;
+  let updated = 0;
+  let skipped = 0;
+  let autoId = bank.length;
+
   rows.slice(1).forEach((row, i) => {
     const line = i + 2;
-    const get = (name: (typeof HEADERS)[number]) => {
+    const get = (name: CsvHeader) => {
       const j = idx(name);
       return j === -1 ? "" : (row[j] ?? "").trim();
     };
-    const balloonNumber = Number(get("balloonNumber"));
-    if (!Number.isInteger(balloonNumber) || balloonNumber < 1 || balloonNumber > 50) {
-      errors.push(`Line ${line}: balloonNumber must be 1–50.`);
-      return;
-    }
-    if (seenBalloons.has(balloonNumber)) {
-      errors.push(`Line ${line}: duplicate balloonNumber ${balloonNumber}.`);
+
+    const question = get("question");
+    if (!question) {
+      errors.push(`Line ${line}: question text is missing.`);
       return;
     }
     const options = [get("optionA"), get("optionB"), get("optionC"), get("optionD")]
       .filter((o) => o !== "");
-    if (options.length < 3) {
-      errors.push(`Line ${line}: at least three options (A–C) are required.`);
+    if (options.length < 2) {
+      errors.push(`Line ${line}: at least two options (optionA, optionB) are required.`);
       return;
     }
-    const correctRaw = get("correctOption").toUpperCase();
-    const correctAnswerIndex = ["A", "B", "C", "D"].indexOf(correctRaw);
+    const correctRaw = get("correctAnswer").toUpperCase();
+    let correctAnswerIndex = ["A", "B", "C", "D"].indexOf(correctRaw);
+    if (correctAnswerIndex === -1 && /^[1-4]$/.test(correctRaw)) {
+      correctAnswerIndex = Number(correctRaw) - 1;
+    }
     if (correctAnswerIndex === -1 || correctAnswerIndex >= options.length) {
-      errors.push(`Line ${line}: correctOption must be A, B, C or D and match an existing option.`);
+      errors.push(`Line ${line}: correctAnswer must be A–D (or 1–4) and match an existing option.`);
       return;
     }
-    const question = get("question");
-    if (!question) {
-      errors.push(`Line ${line}: question text is required.`);
+    const activeRaw = get("active").toLowerCase();
+    if (activeRaw && !["true", "false", "yes", "no", "1", "0"].includes(activeRaw)) {
+      errors.push(`Line ${line}: active must be true/false.`);
       return;
     }
+    const active = activeRaw === "" || ["true", "yes", "1"].includes(activeRaw);
     const difficultyRaw = get("difficulty") || "Medium";
-    const difficulty: Difficulty = ["Easy", "Medium", "Hard"].includes(difficultyRaw)
-      ? (difficultyRaw as Difficulty)
-      : "Medium";
-    const timeLimitRaw = get("timeLimit");
-    const timeLimit = timeLimitRaw ? Number(timeLimitRaw) : null;
+    if (!["Easy", "Medium", "Hard"].includes(difficultyRaw)) {
+      errors.push(`Line ${line}: difficulty must be Easy, Medium or Hard.`);
+      return;
+    }
+    const difficulty = difficultyRaw as Difficulty;
+    const balloonRaw = get("balloonNumber");
+    let balloonNumber: number | null = null;
+    if (balloonRaw !== "") {
+      const n = Number(balloonRaw);
+      if (!Number.isInteger(n) || n < 1 || n > 50) {
+        errors.push(`Line ${line}: balloonNumber must be 1–50 (or empty).`);
+        return;
+      }
+      balloonNumber = n;
+      if (active && seenBalloons.has(n)) {
+        errors.push(`Line ${line}: duplicate balloonNumber ${n} within the file.`);
+        return;
+      }
+      if (active) seenBalloons.add(n);
+    }
 
-    seenBalloons.add(balloonNumber);
-    questions.push({
-      id: balloonNumber,
+    let id = get("id");
+    if (id && seenIds.has(id)) {
+      errors.push(`Line ${line}: duplicate id "${id}" within the file.`);
+      return;
+    }
+    const orderRaw = Number(get("order"));
+
+    if (id && byId.has(id)) {
+      if (!updateExisting) {
+        skipped += 1;
+        return;
+      }
+      const prev = byId.get(id)!;
+      const next: Question = {
+        ...prev,
+        order: Number.isFinite(orderRaw) && orderRaw > 0 ? orderRaw : prev.order,
+        balloonNumber,
+        question,
+        options,
+        correctAnswerIndex,
+        explanation: get("explanation"),
+        category: get("category") || prev.category,
+        difficulty,
+        image: get("image") || null,
+        active,
+        updatedAt: nowIso(),
+      };
+      byId.set(id, next);
+      const at = bank.findIndex((q) => q.id === id);
+      bank[at] = next;
+      seenIds.add(id);
+      updated += 1;
+      return;
+    }
+
+    if (!id) {
+      do {
+        autoId += 1;
+        id = `question-${String(autoId).padStart(3, "0")}`;
+      } while (byId.has(id) || seenIds.has(id));
+    }
+    const ts = nowIso();
+    const created: Question = {
+      id,
+      order: Number.isFinite(orderRaw) && orderRaw > 0 ? orderRaw : bank.length + 1,
       balloonNumber,
-      category: get("category") || "General Safety",
-      difficulty,
       question,
       options,
       correctAnswerIndex,
       explanation: get("explanation"),
+      category: get("category") || "General",
+      difficulty,
       image: get("image") || null,
-      timeLimit: timeLimit && Number.isFinite(timeLimit) ? timeLimit : null,
-    });
+      active,
+      timeLimit: null,
+      createdAt: ts,
+      updatedAt: ts,
+    };
+    bank.push(created);
+    byId.set(id, created);
+    seenIds.add(id);
+    imported += 1;
   });
 
-  if (questions.length < 50) {
-    errors.push(
-      `Only ${questions.length} valid questions imported — the wall has 50 balloons. Balloons without a question show a friendly notice and can be skipped by the admin.`,
-    );
-  }
-  questions.sort((a, b) => a.balloonNumber - b.balloonNumber);
-  return { questions, errors };
+  bank.sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+  return { questions: bank, imported, updated, skipped, errors };
 }
 
 function csvEscape(value: string): string {
@@ -153,6 +240,34 @@ function csvEscape(value: string): string {
     return `"${value.replace(/"/g, '""')}"`;
   }
   return value;
+}
+
+/** Export the full question bank in the import-compatible template format. */
+export function exportQuestionBankCsv(questions: Question[]): string {
+  const lines = [QUESTION_CSV_HEADERS.join(",")];
+  [...questions]
+    .sort((a, b) => a.order - b.order)
+    .forEach((q) => {
+      lines.push(
+        [
+          q.id,
+          String(q.order),
+          q.balloonNumber === null ? "" : String(q.balloonNumber),
+          csvEscape(q.question),
+          csvEscape(q.options[0] ?? ""),
+          csvEscape(q.options[1] ?? ""),
+          csvEscape(q.options[2] ?? ""),
+          csvEscape(q.options[3] ?? ""),
+          ["A", "B", "C", "D"][q.correctAnswerIndex] ?? "A",
+          csvEscape(q.explanation),
+          csvEscape(q.category),
+          q.difficulty,
+          q.active ? "true" : "false",
+          q.image ?? "",
+        ].join(","),
+      );
+    });
+  return lines.join("\n");
 }
 
 export function exportResultsCsv(

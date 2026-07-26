@@ -1,8 +1,10 @@
-import type { GameSettings, GameState, Question } from "./types";
+import type { GameSettings, GameState } from "./types";
 
-const STATE_KEY = "runamsafe.state.v1";
-const SETTINGS_KEY = "runamsafe.settings.v1";
-const QUESTIONS_KEY = "runamsafe.questions.v1";
+const STATE_KEY = "balloonchallenge.state.v2";
+const SETTINGS_KEY = "balloonchallenge.settings.v2";
+// Pre-rebrand keys — read once and migrated forward so a saved game survives.
+const LEGACY_STATE_KEY = "runamsafe.state.v1";
+const LEGACY_SETTINGS_KEY = "runamsafe.settings.v1";
 
 export const DEFAULT_SETTINGS: GameSettings = {
   timerEnabled: true,
@@ -14,7 +16,9 @@ export const DEFAULT_SETTINGS: GameSettings = {
   confettiEnabled: true,
   secondAttemptMode: false,
   startingAvatar: "male",
-  adminPin: "1234",
+  questionMode: "fixed",
+  questionsPerSession: 0,
+  adminPin: "",
 };
 
 export function initialGameState(startingAvatar: "male" | "female"): GameState {
@@ -26,6 +30,7 @@ export function initialGameState(startingAvatar: "male" | "female"): GameState {
     incorrectCount: 0,
     nextAvatar: startingAvatar,
     startedAt: null,
+    assignments: {},
   };
 }
 
@@ -40,8 +45,18 @@ function safeParse<T>(raw: string | null): T | null {
 
 export function loadState(): GameState | null {
   if (typeof window === "undefined") return null;
-  const state = safeParse<GameState>(localStorage.getItem(STATE_KEY));
+  const state =
+    safeParse<GameState>(localStorage.getItem(STATE_KEY)) ??
+    safeParse<GameState>(localStorage.getItem(LEGACY_STATE_KEY));
   if (!state || !Array.isArray(state.poppedBalloons)) return null;
+  // Older saves predate session assignments and string question ids.
+  if (!state.assignments || typeof state.assignments !== "object") {
+    state.assignments = {};
+  }
+  state.outcomes = (state.outcomes ?? []).map((o) => ({
+    ...o,
+    questionId: String(o.questionId),
+  }));
   return state;
 }
 
@@ -53,35 +68,19 @@ export function saveState(state: GameState): void {
 export function clearState(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(STATE_KEY);
+  localStorage.removeItem(LEGACY_STATE_KEY);
 }
 
 export function loadSettings(): GameSettings {
   if (typeof window === "undefined") return DEFAULT_SETTINGS;
-  const stored = safeParse<Partial<GameSettings>>(
-    localStorage.getItem(SETTINGS_KEY),
-  );
+  const stored =
+    safeParse<Partial<GameSettings>>(localStorage.getItem(SETTINGS_KEY)) ??
+    safeParse<Partial<GameSettings>>(localStorage.getItem(LEGACY_SETTINGS_KEY));
   return { ...DEFAULT_SETTINGS, ...stored };
 }
 
 export function saveSettings(settings: GameSettings): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-}
-
-/** Custom question set imported via CSV from the Admin Panel, if any. */
-export function loadCustomQuestions(): Question[] | null {
-  if (typeof window === "undefined") return null;
-  const list = safeParse<Question[]>(localStorage.getItem(QUESTIONS_KEY));
-  if (!list || !Array.isArray(list) || list.length === 0) return null;
-  return list;
-}
-
-export function saveCustomQuestions(questions: Question[]): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(QUESTIONS_KEY, JSON.stringify(questions));
-}
-
-export function clearCustomQuestions(): void {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(QUESTIONS_KEY);
+  localStorage.removeItem(LEGACY_SETTINGS_KEY);
 }
