@@ -125,7 +125,7 @@ export default function QuestionScreen({
     >
       <div
         className={`question-card flex min-h-0 w-full flex-1 flex-col rounded-3xl bg-white shadow-panel transition-all duration-300 ${
-          avatarActive ? "lg:w-[74%]" : "mx-auto max-w-[2400px]"
+          avatarActive ? "lg:w-[74%]" : "mx-auto max-w-[min(96vw,2800px)]"
         }`}
       >
         {/* Header */}

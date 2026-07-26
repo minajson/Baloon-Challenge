@@ -25,13 +25,13 @@ function Stat({
     >
       <span
         className="font-black tabular-nums"
-        style={{ fontSize: "clamp(16px, 1.2vw, 26px)" }}
+        style={{ fontSize: "clamp(16px, 1.2vw, 30px)" }}
       >
         {value}
       </span>
       <span
         className="font-bold uppercase tracking-wide opacity-80"
-        style={{ fontSize: "clamp(10px, 0.7vw, 14px)" }}
+        style={{ fontSize: "clamp(10px, 0.75vw, 15px)" }}
       >
         {label}
       </span>
