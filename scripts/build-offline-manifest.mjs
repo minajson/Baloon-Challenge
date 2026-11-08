@@ -78,7 +78,18 @@ if (!stamp.test(sw)) {
   console.error("sw.js has no VERSION constant to stamp.");
   process.exit(1);
 }
-writeFileSync(swPath, sw.replace(stamp, `const VERSION = "${version}";`));
+const stampedSw = sw.replace(stamp, `const VERSION = "${version}";`);
+writeFileSync(swPath, stampedSw);
+
+// Vercel deploys a Next.js static export from its own build output plus public/,
+// not from out/. So on Vercel (only — locally this would dirty tracked files)
+// also publish the manifest and the stamped worker through public/, which
+// Vercel collects after the build command finishes.
+if (process.env.VERCEL === "1" && !process.env.OUT_DIR) {
+  writeFileSync(join(ROOT, "public", "offline-manifest.json"), JSON.stringify(manifest));
+  writeFileSync(join(ROOT, "public", "sw.js"), stampedSw);
+  console.log("VERCEL=1: also wrote public/offline-manifest.json and public/sw.js");
+}
 
 const mb = (manifest.totalBytes / 1024 / 1024).toFixed(1);
 console.log(`offline manifest: ${files.length} files, ${mb} MB, version ${version}`);
