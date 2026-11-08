@@ -175,7 +175,7 @@ check("Photographs are web-sized (< 1.2 MB each)", sizes.every((s) => s > 20_000
 
 // ------------------------------------------------------------------- assets
 section("Assets");
-const sw = read("public/sw.js");
+const sw = read("scripts/sw.template.js");
 check(
   "Service worker takes its file list from the build's offline manifest (no hand-kept list to go stale)",
   sw.includes("__OFFLINE_VERSION__") && sw.includes("/offline-manifest.json") && !/"\/media\//.test(sw),

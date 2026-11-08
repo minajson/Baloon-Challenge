@@ -6,7 +6,8 @@
  *  - The build writes /offline-manifest.json listing EVERY file of the static
  *    export (HTML, JS/CSS bundles, data, icons, photos, illustrations, audio,
  *    video). `__OFFLINE_VERSION__` is stamped by scripts/build-offline-manifest.mjs
- *    with a hash of that list, so each deployment gets its own cache.
+ *    with a hash of that list, so each deployment gets its own cache. This file is
+ *    the template; the build writes the stamped copy to /sw.js.
  *  - Install: download the complete set into the versioned cache. If ANY file
  *    fails, installation fails — so a service worker only ever becomes active
  *    with a complete cache, and an older complete cache is never replaced by

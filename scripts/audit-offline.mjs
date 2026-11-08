@@ -56,7 +56,7 @@ const rel = (f) => relative(OUT, f).split(sep).join("/");
 section("Offline manifest");
 const notListed = allFiles
   .map(rel)
-  .filter((r) => !["sw.js", "offline-manifest.json"].includes(r))
+  .filter((r) => !["sw.js", "offline-manifest.json", "404.html"].includes(r) && !r.startsWith("_not-found"))
   .filter((r) => !urls.has(r === "index.html" ? "/" : r.endsWith(".html") ? `/${r.slice(0, -5)}` : `/${r}`));
 ok("Every exported file is listed", notListed.length === 0, notListed.slice(0, 4).join(", "));
 const bad = [];
@@ -83,7 +83,8 @@ const need = (label, list) => {
   const missing = list.filter((u) => !urls.has(u));
   ok(`${label} (${list.length})`, missing.length === 0, missing.slice(0, 4).join(", "));
 };
-need("Pages", ["/", "/admin/questions", "/404", "/manifest.webmanifest", "/icon.svg"]);
+need("Pages", ["/", "/admin/questions", "/manifest.webmanifest", "/icon.svg"]);
+ok("Error pages (404 / _not-found) are intentionally not in the offline set", ![...urls].some((u) => u === "/404" || u.startsWith("/_not-found")));
 need("Geological photographs", bank.filter((c) => c.type === "feature").map((c) => c.photo));
 need("Mascot videos", [...new Set(avatars.map((a) => a.fallbackFile).filter(Boolean))]);
 need("Mascot dialogue audio", [...new Set(avatars.map((a) => a.audioFile).filter(Boolean))]);

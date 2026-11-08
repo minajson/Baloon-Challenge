@@ -79,7 +79,7 @@ for game progress and settings · service worker + web manifest.
 | `lib/` | Types, scoring helpers, storage, sound manager |
 | `scripts/validate-content.mjs` | Content validation |
 | `scripts/build-offline-manifest.mjs` | Post-build: lists every file for offline use and stamps the cache version |
-| `public/sw.js`, `lib/offline.ts` | Offline service worker; file verification and the Admin “Offline Mode” status |
+| `scripts/sw.template.js`, `lib/offline.ts` | Offline service worker; file verification and the Admin “Offline Mode” status |
 | `desktop/` | Standalone Mac app (Electron) — builds with `npm run build:mac` |
 | `archive/original-question-bank/` | The previous question bank, kept for restoration; not part of the app |
 | `public/media/` | Photos, mascot videos, audio, sound effects, icons |

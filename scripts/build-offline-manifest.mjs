@@ -24,15 +24,18 @@ if (!existsSync(OUT)) {
   process.exit(1);
 }
 
-// Files that are not part of the offline set.
-const SKIP = new Set([".DS_Store", "sw.js", "offline-manifest.json"]);
+// Files that are not part of the offline set: the worker and manifest
+// themselves, and the framework's "not found" error pages (hosts answer those
+// with HTTP 404 by design, and they are never part of gameplay).
+const SKIP = new Set([".DS_Store", "sw.js", "offline-manifest.json", "404.html"]);
+const isErrorPage = (rel) => rel.startsWith("_not-found");
 
 function walk(dir) {
   const files = [];
   for (const name of readdirSync(dir)) {
     const full = join(dir, name);
     if (statSync(full).isDirectory()) files.push(...walk(full));
-    else if (!SKIP.has(name) && !name.endsWith(".map")) files.push(full);
+    else if (!SKIP.has(name) && !name.endsWith(".map") && !isErrorPage(relative(OUT, full))) files.push(full);
   }
   return files;
 }
@@ -70,21 +73,25 @@ const manifest = {
 };
 writeFileSync(join(OUT, "offline-manifest.json"), JSON.stringify(manifest));
 
+// The worker is generated from scripts/sw.template.js (it is not kept in
+// public/, because Vercel snapshots pre-existing public/ files before the
+// build, which would serve an unstamped copy).
 const swPath = join(OUT, "sw.js");
-const sw = readFileSync(swPath, "utf8");
-// Matches the placeholder (fresh build) or an already-stamped version (re-run).
+const template = existsSync(swPath) && process.env.OUT_DIR ? swPath : join(ROOT, "scripts", "sw.template.js");
+const sw = readFileSync(template, "utf8");
+// Matches the placeholder (fresh build) or an already-stamped version (re-run on a copy).
 const stamp = /const VERSION = "(?:__OFFLINE_VERSION__|[0-9a-f]{12})";/;
 if (!stamp.test(sw)) {
-  console.error("sw.js has no VERSION constant to stamp.");
+  console.error("The service worker has no VERSION constant to stamp.");
   process.exit(1);
 }
 const stampedSw = sw.replace(stamp, `const VERSION = "${version}";`);
 writeFileSync(swPath, stampedSw);
 
 // Vercel deploys a Next.js static export from its own build output plus public/,
-// not from out/. So on Vercel (only — locally this would dirty tracked files)
-// also publish the manifest and the stamped worker through public/, which
-// Vercel collects after the build command finishes.
+// not from out/. So on Vercel also publish the manifest and the stamped worker
+// as NEW files in public/, which Vercel collects after the build command ends.
+// (Both are git-ignored.)
 if (process.env.VERCEL === "1" && !process.env.OUT_DIR) {
   writeFileSync(join(ROOT, "public", "offline-manifest.json"), JSON.stringify(manifest));
   writeFileSync(join(ROOT, "public", "sw.js"), stampedSw);

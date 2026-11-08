@@ -330,7 +330,13 @@ async function verifyWeb({ repair = false, deep = false }: VerifyOptions) {
     await mapLimit(manifest.files, 6, async (f) => {
       const res = await cache.match(f.url, MATCH);
       let good = !!res;
-      if (res && needDeep) good = (await res.blob()).size === f.size;
+      if (res && needDeep) {
+        // /media files are served byte-for-byte as built. Framework files can
+        // differ by a few bytes between the build and the host, so for those
+        // only require that the stored copy is not empty.
+        const size = (await res.blob()).size;
+        good = f.url.startsWith("/media/") ? size === f.size : size > 0;
+      }
       if (good) present += 1;
       else missing.push(f);
       if (present % 8 === 0) setState({ cached: present });
