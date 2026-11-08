@@ -13,6 +13,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "scripts/**",
     "archive/**",
+    "desktop/**",
+    "dist/**",
   ]),
 ]);
 

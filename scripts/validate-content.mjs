@@ -176,9 +176,10 @@ check("Photographs are web-sized (< 1.2 MB each)", sizes.every((s) => s > 20_000
 // ------------------------------------------------------------------- assets
 section("Assets");
 const sw = read("public/sw.js");
-const swPaths = [...sw.matchAll(/"(\/(?:media|icon)[^"]+)"/g)].map((m) => m[1]);
-const missingSw = swPaths.filter((p) => !exists(`public${p}`));
-check("Every offline-cache path exists on disk", missingSw.length === 0, missingSw.join(", "));
+check(
+  "Service worker takes its file list from the build's offline manifest (no hand-kept list to go stale)",
+  sw.includes("__OFFLINE_VERSION__") && sw.includes("/offline-manifest.json") && !/"\/media\//.test(sw),
+);
 const manifest = JSON.parse(read("public/manifest.webmanifest"));
 check(
   "Manifest icons exist",

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import type { AvatarGender, GamePhase, GameSettings, GameState } from "@/lib/types";
 import { exportResultsCsv, downloadFile } from "@/lib/csv";
 import { accuracyPercent } from "@/lib/questions";
+import OfflineStatus from "./OfflineStatus";
 
 /**
  * Authentication is intentionally disabled: the facilitator panel and the
@@ -198,6 +199,11 @@ export default function AdminPanel(props: AdminPanelProps) {
                   onChange={(v) => onSettingsChange({ confettiEnabled: v })}
                 />
               </div>
+            </Section>
+
+            {/* Offline readiness */}
+            <Section title="Offline Mode">
+              <OfflineStatus />
             </Section>
 
             {/* Avatars */}

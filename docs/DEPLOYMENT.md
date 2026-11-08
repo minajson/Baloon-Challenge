@@ -46,3 +46,10 @@ For the live event, prefer running **locally** on the presentation machine
 (step “Local production run” above) so unreliable venue internet cannot
 affect the game. A deployed URL is best used for pre-event review and
 rehearsals.
+
+## Offline support
+
+`npm run build` also runs `scripts/build-offline-manifest.mjs`, which writes
+`out/offline-manifest.json` (every file in the export) and stamps its version
+into `out/sw.js`. Keep the build command as `npm run build` on Vercel/Netlify
+so this step runs. See `docs/OFFLINE.md`.

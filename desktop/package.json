@@ -1,0 +1,11 @@
+{
+  "name": "nape-2026-geoscience-games-desktop",
+  "productName": "NAPE 2026 Geoscience Games",
+  "version": "1.0.0",
+  "description": "Standalone offline Mac app for NAPE 2026 Geoscience Games",
+  "main": "main.cjs",
+  "private": true,
+  "devDependencies": {
+    "electron": "^37.2.0"
+  }
+}

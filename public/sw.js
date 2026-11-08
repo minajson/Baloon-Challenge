@@ -1,160 +1,177 @@
 /*
- * Offline service worker for NAPE 2026 Geoscience Games.
+ * Offline service worker — NAPE 2026 Geoscience Games.
  *
- * Strategy:
- *  - Install: precache the app shell and every game asset (icons, mascots, photos,
- *    mascot videos, ElevenLabs audio, sound effects, music) so the whole
- *    game plays with no internet after one online visit.
- *  - Navigations: network-first with cache fallback, so updates arrive when
- *    online but the game still loads when offline.
- *  - Immutable/static assets (/_next/static hashed bundles, /media files):
- *    cache-first with fill, which also captures question images.
- *  - Everything else — importantly Next's UN-hashed client-navigation
- *    payloads (e.g. /admin/questions.txt) — network-first with cache
- *    fallback. Serving those cache-first breaks <Link> navigation after a
- *    redeploy (a stale payload from the previous build makes clicks like
- *    "View All Challenges" silently fail).
+ * Goal: after one online visit the whole game runs with no internet at all.
+ *
+ *  - The build writes /offline-manifest.json listing EVERY file of the static
+ *    export (HTML, JS/CSS bundles, data, icons, photos, illustrations, audio,
+ *    video). `__OFFLINE_VERSION__` is stamped by scripts/build-offline-manifest.mjs
+ *    with a hash of that list, so each deployment gets its own cache.
+ *  - Install: download the complete set into the versioned cache. If ANY file
+ *    fails, installation fails — so a service worker only ever becomes active
+ *    with a complete cache, and an older complete cache is never replaced by
+ *    a partial one.
+ *  - Fetch: cache-first for everything in the manifest (ignoring query
+ *    strings). Page navigations fall back to the cached app shell. Range
+ *    requests (video/audio seeking) are answered with proper 206 responses,
+ *    which Safari requires.
+ *  - Update: a new version installs in the background and WAITS; it takes over
+ *    the next time the app is closed and reopened (or when the facilitator
+ *    chooses "Apply update" in Admin), so a running game never mixes old
+ *    pages with new bundles.
+ *  - Older caches are deleted on activation.
  */
-// Bumping this name drops every older cache on activation, so no stale
-// media (e.g. previous mascot videos) can be served after an update.
-const VERSION = "nape-geoscience-games-v1";
-const CACHE = `${VERSION}`;
-
-/** Only these are safe to serve cache-first: content-addressed or static. */
-const CACHE_FIRST = /^\/(_next\/static\/|media\/)/;
-
-const PRECACHE = [
-  "/",
-  "/admin/questions/",
-  "/manifest.webmanifest",
-  "/icon.svg",
-  "/media/images/app-icon-192.png",
-  "/media/images/app-icon-512.png",
-  // Mascot master images
-  "/media/images/MASCOT_MALE_MASTER.png",
-  "/media/images/MASCOT_FEMALE_MASTER.png",
-  // Game 4 photographs
-  ...Array.from({ length: 20 }, (_, i) => `/media/photos/feature-${String(i + 1).padStart(2, "0")}.jpg`),
-  // Mascot videos
-  "/media/avatars/male/male_correct_01.mp4",
-  "/media/avatars/male/male_correct_02.mp4",
-  "/media/avatars/male/male_wrong_01.mp4",
-  "/media/avatars/male/male_wrong_02.mp4",
-  "/media/avatars/male/male_final_celebration.mp4",
-  "/media/avatars/female/female_correct_01.mp4",
-  "/media/avatars/female/female_correct_02.mp4",
-  "/media/avatars/female/female_wrong_01.mp4",
-  "/media/avatars/female/female_wrong_02.mp4",
-  "/media/avatars/female/female_final_celebration.mp4",
-  // Mascot voice (ElevenLabs)
-  "/media/audio/male_correct.wav",
-  "/media/audio/male_wrong.wav",
-  "/media/audio/male_final.wav",
-  "/media/audio/female_correct.wav",
-  "/media/audio/female_wrong.wav",
-  "/media/audio/female_final.wav",
-  // Music + sound effects
-  "/media/audio/background-music.wav",
-  "/media/sfx/pop.wav",
-  "/media/sfx/correct.wav",
-  "/media/sfx/wrong.wav",
-  "/media/sfx/tick.wav",
-  "/media/sfx/fanfare.wav",
-  "/media/sfx/click.wav",
-];
+const VERSION = "__OFFLINE_VERSION__";
+const PREFIX = "nape-games-";
+const CACHE = `${PREFIX}${VERSION}`;
+const MANIFEST_URL = "/offline-manifest.json";
+const CONCURRENCY = 6;
+const RETRIES = 2;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) =>
-      // Tolerate individual failures (e.g. optional .mp3 music) — one missing
-      // file must not abort the whole offline preparation.
-      Promise.allSettled(PRECACHE.map((url) => cache.add(url))),
-    ),
+    precacheEverything().catch(async (err) => {
+      // Never leave a half-filled cache behind; the previous version stays active.
+      await caches.delete(CACHE);
+      throw err;
+    }),
   );
-  self.skipWaiting();
 });
+
+async function fetchOk(url) {
+  let lastError;
+  for (let attempt = 0; attempt <= RETRIES; attempt++) {
+    try {
+      const res = await fetch(url, { cache: "reload" });
+      if (res.ok) return res;
+      lastError = new Error(`${res.status} ${url}`);
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError;
+}
+
+async function precacheEverything() {
+  const manifestRes = await fetchOk(MANIFEST_URL);
+  const manifest = await manifestRes.clone().json();
+  if (manifest.version !== VERSION) {
+    // The worker and the manifest come from different deployments — retry later.
+    throw new Error(`manifest ${manifest.version} does not match worker ${VERSION}`);
+  }
+  const cache = await caches.open(CACHE);
+  await cache.put(MANIFEST_URL, manifestRes);
+
+  const queue = [...manifest.files];
+  const worker = async () => {
+    while (queue.length > 0) {
+      const file = queue.shift();
+      const res = await fetchOk(file.url);
+      await cache.put(file.url, res);
+    }
+  };
+  await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+}
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))),
-      )
-      .then(() => self.clients.claim()),
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter(
+            (k) =>
+              k !== CACHE &&
+              (k.startsWith(PREFIX) ||
+                k.startsWith("balloon-challenge-") ||
+                k.startsWith("nape-geoscience-games-")),
+          )
+          .map((k) => caches.delete(k)),
+      );
+      await self.clients.claim();
+    })(),
   );
 });
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+  if (event.data && event.data.type === "GET_VERSION" && event.ports[0]) {
+    event.ports[0].postMessage({ version: VERSION });
+  }
+});
+
+/** Cache key for a page navigation: /index.html and trailing slashes map to the route. */
+function routeKey(url) {
+  let path = url.pathname;
+  if (path.endsWith("/index.html")) path = path.slice(0, -"index.html".length);
+  if (path.endsWith(".html")) path = path.slice(0, -5);
+  if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
+  return new Request(`${url.origin}${path || "/"}`);
+}
+
+async function rangeResponse(request, response) {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("range") || "");
+  if (!match) return response;
+  const buffer = await response.arrayBuffer();
+  const size = buffer.byteLength;
+  let start;
+  let end;
+  if (match[1] === "") {
+    // Suffix range: the last N bytes.
+    start = Math.max(0, size - Number(match[2]));
+    end = size - 1;
+  } else {
+    start = Number(match[1]);
+    end = match[2] === "" ? size - 1 : Math.min(Number(match[2]), size - 1);
+  }
+  if (start >= size || start > end) {
+    return new Response(null, {
+      status: 416,
+      headers: { "Content-Range": `bytes */${size}` },
+    });
+  }
+  return new Response(buffer.slice(start, end + 1), {
+    status: 206,
+    statusText: "Partial Content",
+    headers: {
+      "Content-Type": response.headers.get("Content-Type") || "application/octet-stream",
+      "Content-Range": `bytes ${start}-${end}/${size}`,
+      "Content-Length": String(end - start + 1),
+      "Accept-Ranges": "bytes",
+    },
+  });
+}
+
+async function handle(request) {
+  const url = new URL(request.url);
+  const cache = await caches.open(CACHE);
+  const isNavigation = request.mode === "navigate";
+
+  // ignoreVary: hosts add "Vary: Accept-Encoding", which would otherwise make
+  // a stored response miss for a request carrying real browser headers.
+  const MATCH = { ignoreSearch: true, ignoreVary: true };
+  let cached = await cache.match(isNavigation ? routeKey(url) : request, MATCH);
+  if (!cached && isNavigation) {
+    cached = await cache.match(routeKey(new URL("/", url.origin)), MATCH);
+  }
+
+  if (cached) {
+    return request.headers.has("range") ? rangeResponse(request, cached) : cached;
+  }
+
+  // Not part of the offline set (should not happen during gameplay).
+  try {
+    return await fetch(request);
+  } catch {
+    return Response.error();
+  }
+}
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
-
-  // Navigations: try the network, fall back to the cached page / shell.
-  // The fallback also tries the trailing-slash form so a hard navigation
-  // to /admin/questions finds the precached /admin/questions/ offline.
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(request, copy));
-          return res;
-        })
-        .catch(async () => {
-          const cached =
-            (await caches.match(request)) ??
-            (await caches.match(url.pathname)) ??
-            (await caches.match(
-              url.pathname.endsWith("/") ? url.pathname : `${url.pathname}/`,
-            )) ??
-            (await caches.match("/"));
-          return (
-            cached ??
-            new Response(
-              "<h1>Offline</h1><p>This page has not been cached yet.</p>",
-              { headers: { "Content-Type": "text/html" }, status: 503 },
-            )
-          );
-        }),
-    );
-    return;
-  }
-
-  // Hashed bundles and media: cache-first, filling the cache on first fetch.
-  if (CACHE_FIRST.test(url.pathname)) {
-    event.respondWith(
-      caches.match(request).then(
-        (cached) =>
-          cached ??
-          fetch(request).then((res) => {
-            if (res.ok) {
-              const copy = res.clone();
-              caches.open(CACHE).then((c) => c.put(request, copy));
-            }
-            return res;
-          }),
-      ),
-    );
-    return;
-  }
-
-  // Everything else (RSC navigation payloads, manifest, CSV template…):
-  // network-first so a redeploy is picked up immediately; cached copy only
-  // when genuinely offline.
-  event.respondWith(
-    fetch(request)
-      .then((res) => {
-        if (res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(request, copy));
-        }
-        return res;
-      })
-      .catch(async () => {
-        const cached = await caches.match(request, { ignoreSearch: true });
-        return cached ?? Response.error();
-      }),
-  );
+  if (url.pathname === "/sw.js") return; // the browser manages worker updates itself
+  event.respondWith(handle(request));
 });

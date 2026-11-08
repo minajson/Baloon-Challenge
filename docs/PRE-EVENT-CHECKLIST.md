@@ -10,7 +10,8 @@ day before.
       projector's real resolution (checked at 1366×768, 1920×1080 and
       ultrawide).
 - [ ] Text, tiles and photographs are readable from the back of the room.
-- [ ] Internet disconnected → game still works completely.
+- [ ] Internet disconnected → game still works completely — follow the full
+      offline checklist in `docs/OFFLINE.md` (including a restart).
 
 ## Content (all four games)
 

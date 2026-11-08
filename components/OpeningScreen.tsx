@@ -7,6 +7,7 @@ import { sound } from "@/lib/sound";
 import { BALLOON_COLORS } from "./Balloon";
 import { CATEGORIES } from "@/data/challenges";
 import Emblem from "./Emblem";
+import { OfflineDot } from "./OfflineStatus";
 
 function FloatingBalloons() {
   const reduced = useReducedMotion();
@@ -159,7 +160,7 @@ export default function OpeningScreen({
             aria-label="Admin settings"
             className={`${buttonBase} bg-white text-ink`}
           >
-            ⚙ Admin
+            ⚙ Admin <OfflineDot />
           </button>
         </div>
       </motion.div>

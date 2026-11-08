@@ -1,9 +1,12 @@
 {
+  "id": "/",
   "name": "NAPE 2026 Geoscience Games",
   "short_name": "NAPE Games",
-  "description": "Interactive balloon-popping geoscience games for NAPE 2026.",
+  "description": "Interactive balloon-popping geoscience games for NAPE 2026. Works fully offline once installed.",
   "start_url": "/",
-  "display": "fullscreen",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
   "orientation": "landscape",
   "background_color": "#fbf9f4",
   "theme_color": "#10233f",
@@ -19,6 +22,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/media/images/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

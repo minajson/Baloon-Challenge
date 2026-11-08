@@ -21,3 +21,9 @@ next-env.d.ts
 /.playwright-mcp/
 /*.jpeg
 /*.png
+
+# standalone Mac app (built locally with `npm run build:mac`)
+/dist/
+/desktop/node_modules/
+/desktop/app/
+/desktop/icon.icns

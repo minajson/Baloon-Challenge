@@ -32,9 +32,18 @@ npm run build      # static export to ./out
 npx serve out      # local production run
 ```
 
-After the first online visit the game works fully offline — all challenges,
-sounds, images, photographs and mascot videos are local files, cached by a
-service worker (`public/sw.js`).
+## Works with no internet
+
+Two offline options — see **[`docs/OFFLINE.md`](docs/OFFLINE.md)** for install
+steps, the verification checklist and limitations:
+
+- **Standalone Mac app** (recommended for the event): `npm run build:mac` →
+  `dist/NAPE 2026 Geoscience Games.app`. Double-click; needs no internet,
+  server, Vercel or terminal.
+- **Installable web app (PWA)**: the public site downloads a complete,
+  versioned copy of itself; ⚙ Admin → **Offline Mode** shows
+  *Offline Ready / Preparing Offline Files / Offline Files Incomplete* based on
+  the real stored files.
 
 ## Scripts
 
@@ -44,6 +53,9 @@ service worker (`public/sw.js`).
 | `npm run typecheck` | TypeScript, no emit |
 | `npm run validate` | Content validation (80 challenges, assets, credits, branding scan) |
 | `npm run test:e2e` | Browser test of all four games against the static build (needs Chrome; see `scripts/e2e.mjs`) |
+| `npm run audit:offline` | Audit the build: manifest, required assets, no external dependencies |
+| `npm run test:offline` | Offline PWA test: install, shut the server down, relaunch, play everything (`:safari` for WebKit) |
+| `npm run build:mac` / `npm run test:desktop` | Build / test the standalone Mac app |
 | `npm run check` | lint + typecheck + validate |
 
 ## Tech stack
@@ -66,6 +78,9 @@ for game progress and settings · service worker + web manifest.
 | `data/photo-credits.json` | Author, licence and source for every Game 4 photograph |
 | `lib/` | Types, scoring helpers, storage, sound manager |
 | `scripts/validate-content.mjs` | Content validation |
+| `scripts/build-offline-manifest.mjs` | Post-build: lists every file for offline use and stamps the cache version |
+| `public/sw.js`, `lib/offline.ts` | Offline service worker; file verification and the Admin “Offline Mode” status |
+| `desktop/` | Standalone Mac app (Electron) — builds with `npm run build:mac` |
 | `archive/original-question-bank/` | The previous question bank, kept for restoration; not part of the app |
 | `public/media/` | Photos, mascot videos, audio, sound effects, icons |
 | `docs/` | Operator guide, checklist, content and media guides |
