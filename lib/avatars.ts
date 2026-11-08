@@ -8,8 +8,8 @@ export const DIALOGUE: Record<ResponseType, string> = {
 };
 
 export const MASTER_IMAGES: Record<AvatarGender, string> = {
-  male: "/media/images/RENAISSANCE_MALE_MASCOT_MASTER.png",
-  female: "/media/images/RENAISSANCE_FEMALE_MASCOT_MASTER.png",
+  male: "/media/images/MASCOT_MALE_MASTER.png",
+  female: "/media/images/MASCOT_FEMALE_MASTER.png",
 };
 
 const CLIPS: AvatarClip[] = manifest as AvatarClip[];

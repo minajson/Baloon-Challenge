@@ -3,13 +3,13 @@ import "./globals.css";
 import PwaStatus from "@/components/PwaStatus";
 
 export const metadata: Metadata = {
-  title: "POP THE BALLOON CHALLENGE",
+  title: "NAPE 2026 GEOSCIENCE GAMES",
   description:
-    "Interactive balloon safety challenge for live events — pop a balloon, answer the question.",
+    "Interactive balloon-popping geoscience games for NAPE 2026 — picture puzzles, missing letters, odd one out and geological features.",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/media/images/renaissance-logo.png",
-    apple: "/media/images/renaissance-logo.png",
+    icon: "/icon.svg",
+    apple: "/media/images/app-icon-512.png",
   },
 };
 

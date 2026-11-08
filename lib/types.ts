@@ -1,28 +1,55 @@
-export type Difficulty = "Easy" | "Medium" | "Hard";
+export type Level = "Easy" | "Medium" | "Hard";
 
-export interface Question {
-  /** Stable string id, e.g. "question-001". */
+export type ChallengeType = "picture" | "letters" | "odd" | "feature";
+
+interface ChallengeBase {
+  /** Stable id, e.g. "pp-01", "ml-07", "oo-20", "gf-13". */
   id: string;
-  /** Display / play order in the question bank (1-based). */
-  order: number;
-  /** Fixed balloon assignment (1–50); null = no fixed balloon. */
-  balloonNumber: number | null;
+  /** Global balloon number (1–80). Balloon n always opens challenge n. */
+  balloon: number;
+  /** Item number within its game, exactly as numbered in the source document. */
+  n: number;
   category: string;
-  difficulty: Difficulty;
-  question: string;
-  options: string[];
-  correctAnswerIndex: number;
-  explanation: string;
-  image: string | null;
-  /** Accessible description for the optional image. */
-  imageAlt?: string;
-  /** Inactive questions are excluded from the playable pool. */
-  active: boolean;
-  /** Per-question override in seconds; null uses the global timer setting. */
-  timeLimit: number | null;
-  createdAt: string;
-  updatedAt: string;
+  /** Difficulty from the source document; Game 4 has none. */
+  level: Level | null;
+  /** The authoritative correct answer. Never rendered before Reveal Answer. */
+  answer: string;
 }
+
+export interface PictureChallenge extends ChallengeBase {
+  type: "picture";
+  panelA: string;
+  panelB: string;
+}
+
+export interface LettersChallenge extends ChallengeBase {
+  type: "letters";
+  /** Original pattern, e.g. "F _ S S _ L" (letters and "_" separated by spaces). */
+  pattern: string;
+  hint: string;
+}
+
+export interface OddChallenge extends ChallengeBase {
+  type: "odd";
+  options: string[];
+  /** The original explanation of why the answer doesn't belong. */
+  why: string;
+}
+
+export interface FeatureChallenge extends ChallengeBase {
+  type: "feature";
+  /** Clue 1 (hard, 3 pts), Clue 2 (medium, 2 pts), Clue 3 (easy, 1 pt). */
+  clues: [string, string, string];
+  photoBrief: string;
+  /** Public path to the photograph. */
+  photo: string;
+}
+
+export type Challenge =
+  | PictureChallenge
+  | LettersChallenge
+  | OddChallenge
+  | FeatureChallenge;
 
 export type AvatarGender = "male" | "female";
 export type ResponseType = "correct" | "wrong" | "final";
@@ -41,9 +68,6 @@ export interface AvatarClip {
   hasTransparency: boolean;
 }
 
-/** How questions are matched to popped balloons. */
-export type QuestionMode = "fixed" | "sequential" | "random";
-
 export interface GameSettings {
   timerEnabled: boolean;
   timerDuration: number;
@@ -52,27 +76,22 @@ export interface GameSettings {
   musicEnabled: boolean;
   musicVolume: number;
   confettiEnabled: boolean;
-  secondAttemptMode: boolean;
   startingAvatar: AvatarGender;
-  questionMode: QuestionMode;
-  /** 0 = play until every balloon is used. */
-  questionsPerSession: number;
-  /**
-   * Reserved for a future re-enable of admin authentication. The PIN gate UI
-   * has been removed on request — question management opens directly — but
-   * the setting is kept so auth can be reinstated without a data migration.
-   */
-  adminPin: string;
 }
 
 export type GamePhase = "idle" | "running" | "paused";
 
 export interface BalloonOutcome {
   balloonNumber: number;
+  /** Challenge id. */
   questionId: string;
   category: string;
   correct: boolean;
-  /** "answered" | "timeout" | "admin-correct" | "admin-wrong" | "skipped" */
+  /** Points scored for this challenge (base points + bonus). */
+  points: number;
+  /** Facilitator-awarded bonus point (Odd One Out only). */
+  bonus: boolean;
+  /** "admin-correct" | "admin-wrong" */
   method: string;
   answeredAt: number;
 }
@@ -83,12 +102,13 @@ export interface GameState {
   outcomes: BalloonOutcome[];
   correctCount: number;
   incorrectCount: number;
+  /** Total event points (challenge points + bonus points). */
+  points: number;
   nextAvatar: AvatarGender;
   startedAt: number | null;
-  /**
-   * Balloon number → question id for this session. Guarantees a question is
-   * never served twice in one session, in every question mode.
-   */
+  /** True once the facilitator ended the game early from the admin panel. */
+  finished: boolean;
+  /** Balloon number → challenge id for this session. */
   assignments: Record<string, string>;
 }
 
@@ -99,4 +119,5 @@ export interface CategoryStat {
   correct: number;
   total: number;
   accuracy: number;
+  points: number;
 }

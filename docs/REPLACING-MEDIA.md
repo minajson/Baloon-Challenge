@@ -1,13 +1,26 @@
 # Replacing the Avatar Videos and Voices
 
-## Event branding
+## Branding
 
-Branding lives in `components/BrandHeader.tsx`: the Renaissance logo
-(`public/media/images/renaissance-logo.png`) on the left, the centred game
-title, and the SPE International logo (`public/media/images/spe_logo.png`)
-on the right. To swap a logo, overwrite the PNG (same path) — the header
-preserves each logo's aspect ratio (`object-fit: contain`), so any
-reasonable size works. Do not redraw or recreate the official logos.
+The game is branded **NAPE 2026 GEOSCIENCE GAMES** and carries no
+organisation logos. The title lives in `components/BrandHeader.tsx`,
+`components/OpeningScreen.tsx`, `app/layout.tsx` and
+`public/manifest.webmanifest`. The decorative emblem is
+`components/Emblem.tsx` / `public/icon.svg` (PNG app icons in
+`public/media/images/app-icon-*.png`).
+
+**Mascot clothing carries no lettering.** The original host videos and
+master images had a printed wordmark on the chest; it was removed
+frame-by-frame. If you regenerate any clip, keep the coverall plain.
+
+## Game 4 photographs
+
+`public/media/photos/feature-01.jpg` … `feature-20.jpg` — one per
+challenge, with attribution and licence in `data/photo-credits.json` (also
+listed on the Challenge Bank page and in `docs/PHOTO-CREDITS.md`). To swap a
+photo, overwrite the file (same name, landscape, about 1600–1920 px wide,
+no captions or signs) and update its credit entry. Keep filenames neutral —
+never name a file after its answer. Run `npm run validate` afterwards.
 
 ## Avatar reaction videos
 
@@ -48,33 +61,16 @@ Playback fallback order (automatic, per clip):
 4. mascot master image + on-screen dialogue
 5. skip and continue — the game never crashes on missing media.
 
-## How the shipped clips were generated (regeneration guide)
+## How the shipped clips were generated
 
-The pipeline used the **Higgsfield MCP** (all assets generated during
-development — the live game never calls any AI service):
+The clips were generated during development (the live game never calls any
+AI service): stylised 3D mascot master images, Nigerian-accented dialogue
+audio (WAVs in `public/media/audio/`) and short gesture videos animated
+from each master image so the characters do not drift between clips. To use
+a different voice, regenerate the six lines and overwrite the WAVs.
 
-1. **Wardrobe references** (photoreal, reference-only):
-   `renaissance_male_avatar_master.png`, `renaissance_female_avatar_master.png`
-   (Higgsfield Soul 2).
-2. **Mascot masters** (stylized 3D, the real characters):
-   `RENAISSANCE_MALE_MASCOT_MASTER.png`, `RENAISSANCE_FEMALE_MASCOT_MASTER.png`
-   (Nano Banana Pro, wardrobe image as reference, green RENAISSANCE
-   wordmark on the chest).
-3. **Dialogue audio** (Higgsfield `seed_audio` TTS): male = the account's
-   custom "Tunde" voice; female = "Tasha" preset. Files in
-   `public/media/audio/`. To use a different Nigerian voice, create a
-   custom voice in Higgsfield (Create Voice), regenerate the six lines, and
-   overwrite the WAVs.
-4. **Reaction videos** (Seedance 2.0): `start_image` = the mascot master,
-   `audio_references` = the dialogue WAV, `generate_audio: true`, 1080p,
-   3:4, 4–5 s, prompts describing each gesture. The start image anchors
-   identity so the characters do not drift between clips.
-5. Optional transparency: Higgsfield `remove_background` (video) on each
-   clip; save results as `.webm`/`.mov` next to the MP4s and set `file` +
-   `hasTransparency` in the manifest.
-
-Keep every new clip consistent: same master image, same voice, same
-coverall, same green RENAISSANCE wordmark.
+Keep every new clip consistent: same master image, same voice, same plain
+coverall.
 
 ## Dialogue lines (fixed)
 

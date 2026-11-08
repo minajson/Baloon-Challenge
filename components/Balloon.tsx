@@ -2,6 +2,7 @@
 
 import { memo, useMemo, useState } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
+import { CATEGORIES } from "@/data/challenges";
 
 export interface BalloonColor {
   base: string;
@@ -9,14 +10,10 @@ export interface BalloonColor {
   light: string;
 }
 
-export const BALLOON_COLORS: BalloonColor[] = [
-  { base: "#f26522", dark: "#c94f15", light: "#ff9a66" }, // orange
-  { base: "#1d4570", dark: "#0e2a4d", light: "#4a76a8" }, // navy
-  { base: "#199a54", dark: "#0f7038", light: "#5cc98a" }, // green
-  { base: "#ffc845", dark: "#e0a51e", light: "#ffe08a" }, // yellow
-  { base: "#e8542f", dark: "#bb3c1c", light: "#ff8f6e" }, // coral
-  { base: "#2f6fb0", dark: "#1d4c7e", light: "#6ea3d6" }, // sky blue
-];
+export const BALLOON_COLORS: BalloonColor[] = CATEGORIES.flatMap(
+  (c) => c.colors,
+);
+
 
 function BurstParticles({ color }: { color: BalloonColor }) {
   // Deterministic pseudo-random spread (pure during render).
@@ -55,7 +52,15 @@ function BurstParticles({ color }: { color: BalloonColor }) {
   );
 }
 
-function BalloonSvg({ color, number }: { color: BalloonColor; number: number }) {
+function BalloonSvg({
+  color,
+  number,
+  label,
+}: {
+  color: BalloonColor;
+  number: number;
+  label: number;
+}) {
   const gradId = `bg-${number}`;
   return (
     <svg viewBox="0 0 100 130" className="h-full w-full drop-shadow-lg">
@@ -100,25 +105,43 @@ function BalloonSvg({ color, number }: { color: BalloonColor; number: number }) 
         paintOrder="stroke"
         style={{ fontFamily: "inherit" }}
       >
-        {number}
+        {label}
       </text>
     </svg>
   );
 }
 
+export type BalloonResult = "correct" | "wrong" | "open";
+
 interface BalloonProps {
+  /** Global balloon number (1–80). */
   number: number;
+  /** Number printed on the balloon (position within its game, 1–20). */
+  label: number;
+  /** Glossy palette for this balloon's game. */
+  palette: BalloonColor[];
+  /** Outcome of a completed balloon, shown on its deflated remnant. */
+  result?: BalloonResult;
   popped: boolean;
   disabled: boolean;
   onPop: (number: number) => void;
   index: number;
 }
 
-function BalloonImpl({ number, popped, disabled, onPop, index }: BalloonProps) {
+function BalloonImpl({
+  number,
+  label,
+  palette,
+  result,
+  popped,
+  disabled,
+  onPop,
+  index,
+}: BalloonProps) {
   const reduced = useReducedMotion();
   const [bursting, setBursting] = useState(false);
   const [shaking, setShaking] = useState(false);
-  const color = BALLOON_COLORS[number % BALLOON_COLORS.length];
+  const color = palette[label % palette.length];
 
   // Selected balloon: expand slightly, shake briefly, then burst.
   const handlePop = () => {
@@ -137,13 +160,20 @@ function BalloonImpl({ number, popped, disabled, onPop, index }: BalloonProps) {
   };
 
   if (popped && !bursting) {
-    // Permanently popped: a small deflated remnant with the used number.
+    // Completed balloon: a deflated remnant, clearly different from an
+    // unopened balloon, stamped with the facilitator's verdict.
+    const badge =
+      result === "correct"
+        ? { text: "✓", cls: "bg-ok text-white", name: "completed — correct" }
+        : result === "wrong"
+          ? { text: "✕", cls: "bg-sun text-ink", name: "completed — not quite" }
+          : { text: "•", cls: "bg-ink-soft text-ink", name: "already opened" };
     return (
       <div
-        className="flex h-full w-full flex-col items-center justify-center opacity-45"
-        aria-label={`Balloon ${number} already used`}
+        className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-ink/15 bg-white/55"
+        aria-label={`Balloon ${label} ${badge.name}`}
       >
-        <svg viewBox="0 0 40 40" className="h-1/3 w-1/3">
+        <svg viewBox="0 0 40 40" className="h-[34%] w-[34%] opacity-60">
           <path
             d="M20 6 q8 6 2 12 q-8 6 -4 12 q2 4 -2 6"
             fill="none"
@@ -153,8 +183,14 @@ function BalloonImpl({ number, popped, disabled, onPop, index }: BalloonProps) {
           />
           <circle cx="20" cy="6" r="4" fill={color.base} />
         </svg>
-        <span className="rounded-full bg-white/70 px-2 text-sm font-bold text-ren-navy/60 lg:text-base">
-          {number}
+        <span className="rounded-full bg-white px-2.5 text-sm font-black text-ink/60 lg:text-base">
+          {label}
+        </span>
+        <span
+          className={`flex h-7 w-7 items-center justify-center rounded-full text-base font-black shadow lg:h-9 lg:w-9 lg:text-xl ${badge.cls}`}
+          aria-hidden="true"
+        >
+          {badge.text}
         </span>
       </div>
     );
@@ -168,7 +204,7 @@ function BalloonImpl({ number, popped, disabled, onPop, index }: BalloonProps) {
             type="button"
             onClick={handlePop}
             disabled={disabled}
-            aria-label={`Balloon number ${number}`}
+            aria-label={`Balloon number ${label}`}
             className="h-full w-full cursor-pointer disabled:cursor-not-allowed"
             style={{
               animation: reduced
@@ -199,7 +235,7 @@ function BalloonImpl({ number, popped, disabled, onPop, index }: BalloonProps) {
                   : { scale: 1, rotate: 0 }
               }
             >
-              <BalloonSvg color={color} number={number} />
+              <BalloonSvg color={color} number={number} label={label} />
             </motion.div>
           </motion.button>
         )}

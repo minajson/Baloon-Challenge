@@ -9,9 +9,9 @@ import { accuracyPercent } from "@/lib/questions";
 
 /**
  * Authentication is intentionally disabled: the facilitator panel and the
- * question manager open directly, with no PIN or password. To reinstate a
- * gate later, flip this flag and re-add a check against settings.adminPin
- * before rendering the panel body.
+ * challenge bank open directly, with no PIN or password. To reinstate a
+ * gate later, flip this flag and add a PIN check before rendering the
+ * panel body.
  */
 const ADMIN_AUTH_ENABLED = false;
 
@@ -32,6 +32,7 @@ interface AdminPanelProps {
   onMarkAnswer: (correct: boolean) => void;
   onSkipQuestion: () => void;
   onReturnToWall: () => void;
+  onFinishGame: () => void;
 }
 
 export default function AdminPanel(props: AdminPanelProps) {
@@ -49,7 +50,7 @@ export default function AdminPanel(props: AdminPanelProps) {
   const unlocked = !ADMIN_AUTH_ENABLED;
 
   const exportResults = () => {
-    downloadFile("pop-the-balloon-results.csv", exportResultsCsv(state.outcomes));
+    downloadFile("nape-2026-geoscience-games-results.csv", exportResultsCsv(state.outcomes));
   };
 
   const toggleFullscreen = () => {
@@ -61,7 +62,7 @@ export default function AdminPanel(props: AdminPanelProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-ren-navy/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[90] flex items-center justify-center bg-ink/60 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
@@ -74,12 +75,12 @@ export default function AdminPanel(props: AdminPanelProps) {
         className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-panel"
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black text-ren-navy">⚙ Admin Panel</h2>
+          <h2 className="text-2xl font-black text-ink">⚙ Admin Panel</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close admin panel"
-            className="rounded-xl bg-ren-navy-soft px-3 py-1.5 text-lg font-black text-ren-navy hover:bg-ren-orange hover:text-white"
+            className="rounded-xl bg-ink-soft px-3 py-1.5 text-lg font-black text-ink hover:bg-terra hover:text-white"
           >
             ✕
           </button>
@@ -105,8 +106,11 @@ export default function AdminPanel(props: AdminPanelProps) {
                     ▶ Resume Game
                   </AdminButton>
                 )}
+                <AdminButton tone="navy" onClick={props.onFinishGame}>
+                  🏁 End Game &amp; View Results
+                </AdminButton>
                 <AdminButton tone="navy" onClick={props.onReturnToWall}>
-                  🎈 Return to Balloon Wall
+                  🎈 Return to Balloon Board
                 </AdminButton>
                 <AdminButton tone="navy" onClick={toggleFullscreen}>
                   ⛶ Full Screen On/Off
@@ -114,9 +118,13 @@ export default function AdminPanel(props: AdminPanelProps) {
               </div>
             </Section>
 
-            {/* Current question overrides */}
+            {/* Current challenge */}
             {questionOpen && (
-              <Section title="Current Question">
+              <Section title="Current Challenge">
+                <p className="mb-2 font-semibold text-ink/70">
+                  Reveal, mark and award points with the facilitator bar under
+                  the challenge. These are overrides.
+                </p>
                 <div className="flex flex-wrap gap-2">
                   <AdminButton
                     tone="green"
@@ -126,14 +134,14 @@ export default function AdminPanel(props: AdminPanelProps) {
                     ✓ Mark Correct
                   </AdminButton>
                   <AdminButton
-                    tone="red"
+                    tone="yellow"
                     disabled={questionResolved}
                     onClick={() => props.onMarkAnswer(false)}
                   >
-                    ✕ Mark Incorrect
+                    ✕ Mark Not Quite
                   </AdminButton>
                   <AdminButton tone="yellow" onClick={props.onSkipQuestion}>
-                    ⤼ Skip Damaged Question
+                    ⤼ Skip Challenge
                   </AdminButton>
                 </div>
               </Section>
@@ -143,18 +151,18 @@ export default function AdminPanel(props: AdminPanelProps) {
             <Section title="Timer">
               <div className="flex flex-wrap items-center gap-4">
                 <Toggle
-                  label="Question timer"
+                  label="Challenge timer"
                   checked={settings.timerEnabled}
                   onChange={(v) => onSettingsChange({ timerEnabled: v })}
                 />
-                <label className="flex items-center gap-2 font-bold text-ren-navy">
+                <label className="flex items-center gap-2 font-bold text-ink">
                   Duration
                   <select
                     value={settings.timerDuration}
                     onChange={(e) =>
                       onSettingsChange({ timerDuration: Number(e.target.value) })
                     }
-                    className="rounded-lg border-2 border-ren-navy-soft px-2 py-1 font-bold"
+                    className="rounded-lg border-2 border-ink-soft px-2 py-1 font-bold"
                   >
                     {[15, 20, 30, 45, 60, 90].map((s) => (
                       <option key={s} value={s}>
@@ -163,11 +171,6 @@ export default function AdminPanel(props: AdminPanelProps) {
                     ))}
                   </select>
                 </label>
-                <Toggle
-                  label="Second-attempt mode"
-                  checked={settings.secondAttemptMode}
-                  onChange={(v) => onSettingsChange({ secondAttemptMode: v })}
-                />
               </div>
             </Section>
 
@@ -198,9 +201,9 @@ export default function AdminPanel(props: AdminPanelProps) {
             </Section>
 
             {/* Avatars */}
-            <Section title="Safety Ambassadors">
+            <Section title="Game Hosts">
               <div className="flex flex-wrap items-center gap-2">
-                <label className="mr-2 flex items-center gap-2 font-bold text-ren-navy">
+                <label className="mr-2 flex items-center gap-2 font-bold text-ink">
                   Starting avatar
                   <select
                     value={settings.startingAvatar}
@@ -209,7 +212,7 @@ export default function AdminPanel(props: AdminPanelProps) {
                         startingAvatar: e.target.value as AvatarGender,
                       })
                     }
-                    className="rounded-lg border-2 border-ren-navy-soft px-2 py-1 font-bold"
+                    className="rounded-lg border-2 border-ink-soft px-2 py-1 font-bold"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -230,8 +233,8 @@ export default function AdminPanel(props: AdminPanelProps) {
               </div>
             </Section>
 
-            {/* Questions */}
-            <Section title="Questions">
+            {/* Challenge bank */}
+            <Section title="Challenge Bank">
               <div className="flex flex-wrap items-center gap-2">
                 {/* prefetch={false}: fetch the route payload at click time so
                     a redeploy between page load and click can't leave a stale
@@ -239,20 +242,20 @@ export default function AdminPanel(props: AdminPanelProps) {
                 <Link
                   href="/admin/questions"
                   prefetch={false}
-                  className="rounded-xl bg-ren-orange px-4 py-2 font-black text-white hover:bg-ren-orange-deep"
+                  className="rounded-xl bg-terra px-4 py-2 font-black text-white hover:bg-terra-deep"
                 >
-                  ✎ Manage Questions
+                  📋 View All 80 Challenges
                 </Link>
               </div>
-              <p className="mt-2 text-sm font-semibold text-ren-navy/70">
-                Add, edit, reorder, import/export and preview questions in the
-                Question Manager. Changes apply to new games.
+              <p className="mt-2 text-sm font-semibold text-ink/70">
+                Facilitator-only reference with every answer, hint, clue and
+                photo credit. Do not show this page to players.
               </p>
             </Section>
 
             {/* Data */}
             <Section title="Score & Data">
-              <p className="mb-2 font-semibold text-ren-navy/70">
+              <p className="mb-2 font-semibold text-ink/70">
                 {state.correctCount} correct · {state.incorrectCount} incorrect ·{" "}
                 {accuracyPercent(state)}% accuracy ·{" "}
                 {state.poppedBalloons.length} balloons used
@@ -269,10 +272,10 @@ export default function AdminPanel(props: AdminPanelProps) {
                 </AdminButton>
               </div>
               {confirmReset && (
-                <div className="mt-3 rounded-2xl bg-alert-red-soft p-4">
-                  <p className="font-black text-alert-red">
+                <div className="mt-3 rounded-2xl bg-bad-soft p-4">
+                  <p className="font-black text-bad">
                     {confirmReset === "game"
-                      ? "Reset the whole game? All 50 balloons come back and the score clears."
+                      ? "Reset the whole game? All 80 balloons come back and the score clears."
                       : "Reset the event score? Balloon progress is kept."}
                   </p>
                   <div className="mt-2 flex gap-2">
@@ -304,7 +307,7 @@ export default function AdminPanel(props: AdminPanelProps) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="rounded-2xl bg-cream p-4">
-      <h3 className="mb-2 text-sm font-black uppercase tracking-widest text-ren-orange-deep">
+      <h3 className="mb-2 text-sm font-black uppercase tracking-widest text-terra-deep">
         {title}
       </h3>
       {children}
@@ -322,7 +325,7 @@ function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2 font-bold text-ren-navy">
+    <label className="flex cursor-pointer items-center gap-2 font-bold text-ink">
       <button
         type="button"
         role="switch"
@@ -330,7 +333,7 @@ function Toggle({
         aria-label={label}
         onClick={() => onChange(!checked)}
         className={`relative h-7 w-12 rounded-full transition ${
-          checked ? "bg-safety-green" : "bg-ren-navy/25"
+          checked ? "bg-ok" : "bg-ink/25"
         }`}
       >
         <span
@@ -356,10 +359,10 @@ function AdminButton({
   children: React.ReactNode;
 }) {
   const tones: Record<string, string> = {
-    green: "bg-safety-green text-white hover:bg-safety-green/85",
-    red: "bg-alert-red text-white hover:bg-alert-red/85",
-    navy: "bg-ren-navy text-white hover:bg-ren-navy-mid",
-    yellow: "bg-warm-yellow text-ren-navy hover:bg-warm-yellow/80",
+    green: "bg-ok text-white hover:bg-ok/85",
+    red: "bg-bad text-white hover:bg-bad/85",
+    navy: "bg-ink text-white hover:bg-ink-mid",
+    yellow: "bg-sun text-ink hover:bg-sun/80",
   };
   return (
     <button

@@ -3,18 +3,21 @@
 import { motion } from "framer-motion";
 
 const STEPS = [
-  { icon: "🎈", text: "Walk up and choose any available balloon on the wall." },
-  { icon: "💥", text: "The balloon pops and reveals your safety question." },
-  { icon: "🅰️", text: "Pick ONE answer — A, B, C or D. Big buttons, no pressure!" },
+  { icon: "🎈", text: "Pick a game tab, then choose any balloon on the board." },
+  { icon: "💥", text: "The balloon pops and opens its challenge." },
   {
-    icon: "✅",
-    text: "See instantly whether you got it right, with a quick explanation.",
+    icon: "🧩",
+    text: "Picture Puzzles, Missing Letters, Odd One Out or Guess the Feature — four games, 80 challenges.",
   },
   {
-    icon: "🧑🏾‍🏭",
-    text: "Our Renaissance safety ambassadors will cheer you on either way.",
+    icon: "👁",
+    text: "Take your guess. The facilitator reveals the answer and decides if you got it.",
   },
-  { icon: "👥", text: "Hand over to the next participant. One balloon per person!" },
+  {
+    icon: "🔎",
+    text: "In Guess the Feature, fewer clues means more points: 3, 2 or 1.",
+  },
+  { icon: "🎈", text: "Back to the board — the next player pops a new balloon!" },
 ];
 
 export default function HowToPlay({ onClose }: { onClose: () => void }) {
@@ -22,7 +25,7 @@ export default function HowToPlay({ onClose }: { onClose: () => void }) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-ren-navy/60 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-ink/60 p-6 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
@@ -35,12 +38,12 @@ export default function HowToPlay({ onClose }: { onClose: () => void }) {
         className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-panel lg:p-8"
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-black text-ren-navy">How to Play</h2>
+          <h2 className="text-3xl font-black text-ink">How to Play</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-xl bg-ren-navy-soft px-3 py-1.5 text-xl font-black text-ren-navy hover:bg-ren-orange hover:text-white"
+            className="rounded-xl bg-ink-soft px-3 py-1.5 text-xl font-black text-ink hover:bg-terra hover:text-white"
           >
             ✕
           </button>
@@ -49,14 +52,14 @@ export default function HowToPlay({ onClose }: { onClose: () => void }) {
           {STEPS.map((s, i) => (
             <li key={i} className="flex items-start gap-4">
               <span className="text-3xl">{s.icon}</span>
-              <p className="text-lg font-semibold text-ren-navy/90 lg:text-xl">
+              <p className="text-lg font-semibold text-ink/90 lg:text-xl">
                 {s.text}
               </p>
             </li>
           ))}
         </ul>
-        <p className="mt-6 rounded-2xl bg-safety-green-soft p-4 text-center text-lg font-black text-safety-green">
-          No names, no sign-up — just pick a balloon and play!
+        <p className="mt-6 rounded-2xl bg-ok-soft p-4 text-center text-lg font-black text-ok">
+          No names, no sign-up — just pop a balloon and play!
         </p>
       </motion.div>
     </motion.div>

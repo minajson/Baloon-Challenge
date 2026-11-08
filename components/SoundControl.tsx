@@ -23,7 +23,7 @@ export default function SoundControl({
         onClick={() => setOpen((o) => !o)}
         aria-label="Sound controls"
         aria-expanded={open}
-        className="rounded-xl bg-white p-2.5 text-ren-navy shadow-panel transition hover:scale-105 hover:text-ren-orange"
+        className="rounded-xl bg-white p-2.5 text-ink shadow-panel transition hover:scale-105 hover:text-terra"
       >
         {settings.soundEnabled ? (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -55,7 +55,7 @@ export default function SoundControl({
             checked={settings.musicEnabled}
             onChange={(v) => onChange({ musicEnabled: v })}
           />
-          <label className="mt-3 block text-sm font-bold text-ren-navy">
+          <label className="mt-3 block text-sm font-bold text-ink">
             Music volume
             <input
               type="range"
@@ -65,7 +65,7 @@ export default function SoundControl({
               onChange={(e) =>
                 onChange({ musicVolume: Number(e.target.value) / 100 })
               }
-              className="mt-1 w-full accent-safety-green"
+              className="mt-1 w-full accent-ok"
               aria-label="Music volume"
             />
           </label>
@@ -85,7 +85,7 @@ function Row({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 py-1.5 font-bold text-ren-navy">
+    <label className="flex cursor-pointer items-center justify-between gap-3 py-1.5 font-bold text-ink">
       {label}
       <button
         type="button"
@@ -94,7 +94,7 @@ function Row({
         aria-label={label}
         onClick={() => onChange(!checked)}
         className={`relative h-7 w-12 shrink-0 rounded-full transition ${
-          checked ? "bg-safety-green" : "bg-ren-navy/25"
+          checked ? "bg-ok" : "bg-ink/25"
         }`}
       >
         <span

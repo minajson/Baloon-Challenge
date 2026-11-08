@@ -14,10 +14,10 @@ function Stat({
   tone: "green" | "red" | "navy" | "orange";
 }) {
   const tones: Record<string, string> = {
-    green: "bg-safety-green-soft text-safety-green",
-    red: "bg-alert-red-soft text-alert-red",
-    navy: "bg-ren-navy-soft text-ren-navy",
-    orange: "bg-ren-orange-soft text-ren-orange-deep",
+    green: "bg-ok-soft text-ok",
+    red: "bg-bad-soft text-bad",
+    navy: "bg-ink-soft text-ink",
+    orange: "bg-terra-soft text-terra-deep",
   };
   return (
     <div
@@ -59,21 +59,22 @@ export default function ScoreBar({
     <div className="flex items-center justify-between gap-4 px-4 py-1.5 lg:px-8">
       <div className="flex items-center gap-3">
         <span
-          className="hidden font-semibold uppercase tracking-widest text-safety-green md:block"
+          className="hidden font-semibold uppercase tracking-widest text-ok md:block"
           style={{ fontSize: "clamp(11px, 0.8vw, 15px)" }}
         >
-          Pick a balloon. Answer the question.
+          Pop a balloon. Solve the challenge.
         </span>
         {paused && (
-          <span className="rounded-full bg-warm-yellow px-3 py-1 text-sm font-black text-ren-navy">
+          <span className="rounded-full bg-sun px-3 py-1 text-sm font-black text-ink">
             PAUSED
           </span>
         )}
       </div>
       <div className="flex items-center gap-2 lg:gap-3">
+        <Stat label="Points" value={String(state.points)} tone="orange" />
         <Stat label="Correct" value={String(state.correctCount)} tone="green" />
         <Stat
-          label="Incorrect"
+          label="Not Quite"
           value={String(state.incorrectCount)}
           tone="red"
         />
@@ -81,14 +82,14 @@ export default function ScoreBar({
         <Stat
           label="Accuracy"
           value={`${accuracyPercent(state)}%`}
-          tone="orange"
+          tone="navy"
         />
         <SoundControl settings={settings} onChange={onSettingsChange} />
         <button
           type="button"
           onClick={onAdminClick}
           aria-label="Admin settings"
-          className="rounded-xl bg-white p-2.5 text-ren-navy shadow-panel transition hover:scale-105 hover:text-ren-orange"
+          className="rounded-xl bg-white p-2.5 text-ink shadow-panel transition hover:scale-105 hover:text-terra"
         >
           <svg
             width="22"

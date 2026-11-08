@@ -153,7 +153,7 @@ export default function AvatarOverlay({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={MASTER_IMAGES[clip.gender]}
-                alt={`${clip.gender} safety ambassador`}
+                alt={`${clip.gender} game host`}
                 className="max-h-[62vh] w-full object-contain drop-shadow-2xl"
                 style={{ objectPosition: "center bottom" }}
               />
@@ -162,7 +162,7 @@ export default function AvatarOverlay({
               <button
                 type="button"
                 onClick={finish}
-                className="pointer-events-auto absolute right-0 top-0 rounded-full bg-ren-navy/85 px-3 py-1 text-xs font-bold text-white shadow hover:bg-ren-navy"
+                className="pointer-events-auto absolute right-0 top-0 rounded-full bg-ink/85 px-3 py-1 text-xs font-bold text-white shadow hover:bg-ink"
               >
                 Skip ▸
               </button>
@@ -170,7 +170,7 @@ export default function AvatarOverlay({
           </div>
           {/* Subtitle — always visible for accessibility */}
           <p
-            className="mt-2 rounded-2xl bg-ren-navy/90 px-4 py-2 text-center text-base font-bold leading-snug text-white shadow-panel lg:text-lg"
+            className="mt-2 rounded-2xl bg-ink/90 px-4 py-2 text-center text-base font-bold leading-snug text-white shadow-panel lg:text-lg"
             aria-live="polite"
           >
             “{clip.dialogue}”

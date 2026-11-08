@@ -1,12 +1,23 @@
-# POP THE BALLOON CHALLENGE
+# NAPE 2026 GEOSCIENCE GAMES
 
-An interactive, offline-capable safety game. Fifty numbered balloons hide
-safety questions; participants pop a balloon, answer the question and get an
-instant reaction from one of two animated Nigerian safety-ambassador mascots.
-Branding: Renaissance logo (left) and SPE International logo (right) in a
-compact header around the centred game title.
+An interactive, offline-capable balloon game for live events. Eighty numbered
+balloons hide geoscience challenges across four games. A participant pops a
+balloon, takes on the challenge, and the facilitator reveals the answer and
+scores it. Animated host mascots react to every result.
 
 No participant names, emails or personal information are collected.
+
+## The four games (20 challenges each)
+
+| # | Game | What players do |
+| --- | --- | --- |
+| 1 | 🧩 **Picture Puzzles** | Two pictures with a **+** between them — name the geoscience term |
+| 2 | 🔤 **Missing Letters** | Fill the blanks using big letter tiles (touch, mouse or keyboard); optional hint |
+| 3 | 🎯 **Odd One Out** | Pick the card that doesn't belong; the facilitator reveals the answer, then why |
+| 4 | 🌋 **Guess the Geological Feature** | Study a photograph; clues are revealed one at a time for 3 / 2 / 1 points |
+
+Content source: *NAPE 2026 Geoscience Games* (Olem Oruene, 4 November 2026),
+transcribed verbatim into [`data/nape2026.json`](data/nape2026.json).
 
 ## Quick start
 
@@ -15,87 +26,69 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Production build (static export to ./out):
-
 ```bash
-npm run build
+npm run check      # lint + typecheck + content validation
+npm run build      # static export to ./out
+npx serve out      # local production run
 ```
 
-Serve `out/` from any static host or `npx serve out` for a local
-production run. **After the build the game works fully offline** — all
-questions, sounds, images and avatar videos are local files, and a service
-worker (`public/sw.js`) caches the app shell and every game asset after the
-first online visit.
+After the first online visit the game works fully offline — all challenges,
+sounds, images, photographs and mascot videos are local files, cached by a
+service worker (`public/sw.js`).
+
+## Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript, no emit |
+| `npm run validate` | Content validation (80 challenges, assets, credits, branding scan) |
+| `npm run test:e2e` | Browser test of all four games against the static build (needs Chrome; see `scripts/e2e.mjs`) |
+| `npm run check` | lint + typecheck + validate |
 
 ## Tech stack
 
-- Next.js (App Router, static export) + TypeScript
-- Tailwind CSS v4
-- Framer Motion for animations
-- HTML5 audio/video with a Web Audio synthesis fallback
-- `localStorage` for game progress, settings and the editable question bank
-  (survives refresh); service worker + web app manifest for offline mode
+Next.js (App Router, static export) · TypeScript · Tailwind CSS v4 ·
+Framer Motion · HTML5 audio/video with a Web Audio fallback · `localStorage`
+for game progress and settings · service worker + web manifest.
 
 ## Project layout
 
 | Path | Purpose |
 | --- | --- |
-| `app/page.tsx` | Game orchestrator (screens, state machine, persistence) |
-| `app/admin/questions/` | Question Manager (CRUD, reorder, CSV, settings) |
-| `components/` | Balloon wall, question card, avatar overlay, admin panel, results… |
-| `components/BrandHeader.tsx` | Renaissance / title / SPE header |
-| `data/questions.ts` | The 50 default questions (Restore Defaults source) |
-| `data/avatar-manifest.json` | Avatar clip manifest (files, dialogue, fallbacks) |
-| `lib/` | Types, storage, question store, sound manager, CSV import/export |
-| `public/media/avatars/` | Mascot reaction videos (male/, female/) |
-| `public/media/audio/` | Recorded dialogue lines + background music |
-| `public/media/images/` | Logos (`renaissance-logo.png`, `spe_logo.png`), mascot masters |
-| `public/media/sfx/` | Sound effects (regenerate with `npm run sfx`) |
-| `public/questions-template.csv` | CSV template for question import |
-| `public/sw.js` / `public/manifest.webmanifest` | Offline service worker + PWA manifest |
-| `docs/` | Operator guide, checklists, replacement instructions |
+| `app/page.tsx` | Game orchestrator (screens, state machine, scoring, persistence) |
+| `app/admin/questions/` | Facilitator-only Challenge Bank (read-only, shows answers + photo credits) |
+| `components/BalloonWall.tsx`, `Balloon.tsx` | Tabbed balloon board and the balloon pop animation |
+| `components/challenge/` | The four game layouts, the facilitator bar and the Game 1 illustrations |
+| `components/AdminPanel.tsx` | Facilitator settings: timer, sound, pause, reset, end game, export |
+| `data/nape2026.json` | The 80 challenges — authoritative source |
+| `data/challenges.ts` | Typed loader, game categories/colours, Odd One Out card emoji |
+| `data/photo-credits.json` | Author, licence and source for every Game 4 photograph |
+| `lib/` | Types, scoring helpers, storage, sound manager |
+| `scripts/validate-content.mjs` | Content validation |
+| `archive/original-question-bank/` | The previous question bank, kept for restoration; not part of the app |
+| `public/media/` | Photos, mascot videos, audio, sound effects, icons |
+| `docs/` | Operator guide, checklist, content and media guides |
 
-## Game flow
+## Facilitator flow
 
-1. **Opening screen** — Start Game / How to Play / Sound Test / Full Screen / Admin.
-2. **Balloon wall** — 50 floating balloons under the logo header, live
-   counters (correct, incorrect, remaining, accuracy).
-3. **Question card** — large A–D answers, optional 30 s timer with soft
-   countdown, one attempt (or admin-enabled second-attempt mode).
-4. **Reaction** — the male and female mascots alternate automatically.
-   Correct: confetti + a warm well-done line. Wrong: an encouraging retry
-   line — always warm, never mocking. The mascot stays until the
-   facilitator clicks **Next Participant**.
-5. **Results** — totals, accuracy, strongest/weakest categories, final
-   celebration clips, export, restart.
+1. **Open Balloon** — the participant picks a game tab and pops a balloon.
+2. The challenge opens. The participant attempts it (tiles, card or guess).
+3. **Show Hint** (Missing Letters) · **Reveal Clue** (Game 4, one at a time).
+4. **Reveal Answer** — answers are never on screen before this. In Odd One
+   Out, **Reveal Why** shows the original explanation afterwards.
+5. **Correct** or **Not Quite** — scoring is always the facilitator's call.
+   Game 4 awards 3 / 2 / 1 points by clues used; other games award 1 point.
+6. **Award Bonus Point** (Odd One Out) — +1 for a correct reason, only when
+   the facilitator presses it.
+7. **Next Challenge** (next unopened balloon in the same game) or
+   **Return to Board**. Completed balloons stay deflated with a ✓ / ✕ stamp.
 
-Progress is saved automatically; an accidental refresh offers
-**Resume Previous Game**.
+**Reset Game** and **End Game & View Results** live in the ⚙ Admin panel.
 
-## Admin panel
-
-Open with the ⚙ icon (top-right) — **no PIN or password**. Includes:
-start/pause/resume/reset, timer settings, sound / music / confetti / avatar
-toggles, avatar previews, manual mark correct/incorrect, skip damaged
-question, results export, fullscreen, and a link to the Question Manager.
-
-## Question Manager (`/admin/questions`)
-
-Opens directly (no authentication — see `ADMIN_AUTH_ENABLED` in
-`components/AdminPanel.tsx` to reinstate a gate later). Supports: view /
-search / filter / sort, add, edit, duplicate, delete (with confirmation),
-enable/disable, drag-and-drop + move up/down + manual order, balloon
-assignment with duplicate warnings, per-question images with alt text,
-question preview, CSV import (with import summary and optional
-update-existing), CSV export, restore defaults, active-question count, and
-game settings (fixed / sequential / random question modes, questions per
-session).
+See [`docs/OPERATOR-GUIDE.md`](docs/OPERATOR-GUIDE.md) and
+[`docs/PRE-EVENT-CHECKLIST.md`](docs/PRE-EVENT-CHECKLIST.md) for event day.
 
 ## Deployment
 
-See `docs/DEPLOYMENT.md` for Netlify and Vercel instructions.
-
-## Event day
-
-Read `docs/OPERATOR-GUIDE.md` and run through
-`docs/PRE-EVENT-CHECKLIST.md` on the actual event machine.
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).

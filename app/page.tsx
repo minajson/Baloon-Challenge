@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   AvatarClip,
   AvatarGender,
+  ChallengeType,
   GameSettings,
   GameState,
-  Question,
   Screen,
 } from "@/lib/types";
 import {
@@ -19,16 +19,17 @@ import {
   saveState,
 } from "@/lib/storage";
 import {
-  activeQuestions,
-  assignedQuestion,
-  pickQuestionForBalloon,
+  activeChallenges,
+  assignedChallenge,
+  challengeForBalloon,
+  nextUnopenedInCategory,
 } from "@/lib/questions";
+import { TOTAL_BALLOONS } from "@/data/challenges";
 import { allClipUrls, otherGender, pickClip, preloadTargets } from "@/lib/avatars";
 import { sound } from "@/lib/sound";
-import type { ResolveMethod } from "@/components/QuestionScreen";
+import ChallengeScreen, { type Resolution } from "@/components/challenge/ChallengeScreen";
 import OpeningScreen from "@/components/OpeningScreen";
 import BalloonWall from "@/components/BalloonWall";
-import QuestionScreen from "@/components/QuestionScreen";
 import AvatarOverlay from "@/components/AvatarOverlay";
 import AdminPanel from "@/components/AdminPanel";
 import ResultsScreen from "@/components/ResultsScreen";
@@ -36,28 +37,30 @@ import ScoreBar from "@/components/ScoreBar";
 import BrandHeader from "@/components/BrandHeader";
 import Confetti from "@/components/Confetti";
 
-const TOTAL_BALLOONS = 50;
+const CHALLENGES = activeChallenges();
 
 export default function Game() {
   const [hydrated, setHydrated] = useState(false);
   const [screen, setScreen] = useState<Screen>("opening");
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
   const [game, setGame] = useState<GameState>(() => initialGameState("male"));
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [boardTab, setBoardTab] = useState<ChallengeType>("picture");
   const [activeBalloon, setActiveBalloon] = useState<number | null>(null);
-  const [resolved, setResolved] = useState<{
-    correct: boolean;
-    method: ResolveMethod;
-  } | null>(null);
-  const [showNext, setShowNext] = useState(false);
+  const [resolved, setResolved] = useState<Resolution | null>(null);
   const [avatarClip, setAvatarClip] = useState<AvatarClip | null>(null);
   const [previewClip, setPreviewClip] = useState<AvatarClip | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [confettiFire, setConfettiFire] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const preloadedAll = useRef(false);
+  /** Delayed reaction effects (confetti, mascot clip) — cancelled when the facilitator moves on. */
+  const reactionTimers = useRef<number[]>([]);
+  const clearReactionTimers = useCallback(() => {
+    reactionTimers.current.forEach((t) => window.clearTimeout(t));
+    reactionTimers.current = [];
+  }, []);
 
-  // ---- Hydration: restore settings, question set and saved game ----
+  // ---- Hydration: restore settings and the saved game ----
   // One-time sync FROM localStorage after mount. Reading in a mount effect
   // (rather than in state initializers) keeps the server-rendered HTML and
   // the first client render identical, so static export hydrates cleanly.
@@ -65,7 +68,6 @@ export default function Game() {
     const s = loadSettings();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSettings(s);
-    setQuestions(activeQuestions());
     const saved = loadState();
     if (saved) setGame(saved);
     else setGame(initialGameState(s.startingAvatar));
@@ -116,44 +118,30 @@ export default function Game() {
     }
   }, [screen, warmClips]);
 
-  // Pick up admin question edits made in another tab (e.g. /admin/questions)
-  // without disturbing a question that is currently on screen.
-  useEffect(() => {
-    const refresh = () => {
-      if (document.visibilityState === "visible" && screen !== "question") {
-        setQuestions(activeQuestions());
-      }
-    };
-    window.addEventListener("visibilitychange", refresh);
-    window.addEventListener("focus", refresh);
-    return () => {
-      window.removeEventListener("visibilitychange", refresh);
-      window.removeEventListener("focus", refresh);
-    };
-  }, [screen]);
-
   const paused = game.phase === "paused";
-  const activeQuestion = useMemo(
+  const activeChallenge = useMemo(
     () =>
       activeBalloon !== null
-        ? assignedQuestion(questions, game, activeBalloon)
+        ? assignedChallenge(CHALLENGES, game, activeBalloon)
         : undefined,
-    [activeBalloon, questions, game],
+    [activeBalloon, game],
+  );
+  const nextChallenge = useMemo(
+    () =>
+      activeBalloon !== null
+        ? nextUnopenedInCategory(CHALLENGES, game, activeBalloon)
+        : undefined,
+    [activeBalloon, game],
   );
 
-  // A session ends when every balloon is used or the configured
-  // questions-per-session limit is reached (0 = no limit).
+  // A session ends when every balloon is used or the facilitator ends it.
   const sessionComplete = useCallback(
-    (g: GameState) =>
-      g.poppedBalloons.length >= TOTAL_BALLOONS ||
-      (settings.questionsPerSession > 0 &&
-        g.outcomes.length >= settings.questionsPerSession),
-    [settings.questionsPerSession],
+    (g: GameState) => g.finished || g.poppedBalloons.length >= TOTAL_BALLOONS,
+    [],
   );
 
   const hasSavedGame =
-    game.poppedBalloons.length > 0 &&
-    game.poppedBalloons.length < TOTAL_BALLOONS;
+    game.poppedBalloons.length > 0 && !sessionComplete(game);
 
   // ---- Actions ----
   const startGame = useCallback(() => {
@@ -161,7 +149,6 @@ export default function Game() {
     setGame({ ...initialGameState(settings.startingAvatar), phase: "running", startedAt: Date.now() });
     setActiveBalloon(null);
     setResolved(null);
-    setShowNext(false);
     setScreen("wall");
     sound.preload();
   }, [settings.startingAvatar]);
@@ -172,59 +159,79 @@ export default function Game() {
     sound.preload();
   }, [game, sessionComplete]);
 
+  /** Open a balloon's challenge (the pop sound and burst are played by the caller). */
+  const openChallenge = useCallback(
+    (n: number, delayMs: number) => {
+      clearReactionTimers();
+      const c = challengeForBalloon(CHALLENGES, game, n);
+      setGame((g) => ({
+        ...g,
+        poppedBalloons: g.poppedBalloons.includes(n)
+          ? g.poppedBalloons
+          : [...g.poppedBalloons, n],
+        assignments: c ? { ...g.assignments, [String(n)]: c.id } : g.assignments,
+      }));
+      if (!c) {
+        setToast(`Balloon ${n} has no challenge available — it was skipped.`);
+        window.setTimeout(() => setToast(null), 3500);
+        return;
+      }
+      // Give the burst animation a beat before the challenge appears.
+      window.setTimeout(() => {
+        setBoardTab(c.type);
+        setActiveBalloon(n);
+        setResolved(null);
+        setAvatarClip(null);
+        setScreen("question");
+      }, delayMs);
+    },
+    [game, clearReactionTimers],
+  );
+
   const handlePop = useCallback(
     (n: number) => {
       if (paused) return;
       void sound.play("pop");
-      const q = pickQuestionForBalloon(questions, game, settings.questionMode, n);
-      setGame((g) => ({
-        ...g,
-        poppedBalloons: [...g.poppedBalloons, n],
-        assignments: q ? { ...g.assignments, [String(n)]: q.id } : g.assignments,
-      }));
-      if (!q) {
-        setToast(`Balloon ${n} has no question available — it was skipped.`);
-        window.setTimeout(() => setToast(null), 3500);
-        return;
-      }
-      // Give the burst animation a beat before the question card appears.
-      window.setTimeout(() => {
-        setActiveBalloon(n);
-        setResolved(null);
-        setShowNext(false);
-        setScreen("question");
-      }, 420);
+      openChallenge(n, 420);
     },
-    [paused, questions, game, settings.questionMode],
+    [paused, openChallenge],
   );
 
   const handleResolve = useCallback(
-    (correct: boolean, method: ResolveMethod) => {
-      if (!activeQuestion || activeBalloon === null) return;
-      setResolved({ correct, method });
+    (correct: boolean, info: { points: number; bonus: boolean }) => {
+      if (!activeChallenge || activeBalloon === null) return;
+      setResolved({ correct, points: info.points, bonus: info.bonus });
       setGame((g) => ({
         ...g,
         correctCount: g.correctCount + (correct ? 1 : 0),
         incorrectCount: g.incorrectCount + (correct ? 0 : 1),
+        points: g.points + info.points,
         nextAvatar: otherGender(g.nextAvatar),
         outcomes: [
           ...g.outcomes,
           {
             balloonNumber: activeBalloon,
-            questionId: activeQuestion.id,
-            category: activeQuestion.category,
+            questionId: activeChallenge.id,
+            category: activeChallenge.category,
             correct,
-            method,
+            points: info.points,
+            bonus: info.bonus,
+            method: correct ? "admin-correct" : "admin-wrong",
             answeredAt: Date.now(),
           },
         ],
       }));
-      window.setTimeout(
-        () => void sound.play(correct ? "correct" : "wrong"),
-        correct ? 120 : 750,
+      clearReactionTimers();
+      reactionTimers.current.push(
+        window.setTimeout(
+          () => void sound.play(correct ? "correct" : "wrong"),
+          correct ? 120 : 300,
+        ),
       );
       if (correct && settings.confettiEnabled) {
-        window.setTimeout(() => setConfettiFire((n) => n + 1), 200);
+        reactionTimers.current.push(
+          window.setTimeout(() => setConfettiFire((n) => n + 1), 200),
+        );
       }
       if (settings.avatarVideosEnabled) {
         const clip = pickClip(
@@ -232,14 +239,15 @@ export default function Game() {
           correct ? "correct" : "wrong",
           game.outcomes.length,
         );
-        window.setTimeout(() => setAvatarClip(clip), correct ? 700 : 1500);
-      } else {
-        setShowNext(true);
+        reactionTimers.current.push(
+          window.setTimeout(() => setAvatarClip(clip), correct ? 700 : 900),
+        );
       }
     },
     [
-      activeQuestion,
+      activeChallenge,
       activeBalloon,
+      clearReactionTimers,
       game.nextAvatar,
       game.outcomes.length,
       settings.avatarVideosEnabled,
@@ -247,37 +255,66 @@ export default function Game() {
     ],
   );
 
-  const handleAvatarDone = useCallback(() => {
-    // The mascot stays visible (held by the overlay) until Next Participant.
-    setShowNext(true);
-  }, []);
+  /** Facilitator toggles the Odd One Out bonus point after the attempt was marked. */
+  const handleBonus = useCallback(
+    (awarded: boolean) => {
+      if (activeBalloon === null) return;
+      setGame((g) => {
+        const outcome = g.outcomes.find((o) => o.balloonNumber === activeBalloon);
+        if (!outcome || outcome.bonus === awarded) return g;
+        const delta = awarded ? 1 : -1;
+        return {
+          ...g,
+          points: g.points + delta,
+          outcomes: g.outcomes.map((o) =>
+            o.balloonNumber === activeBalloon
+              ? { ...o, bonus: awarded, points: o.points + delta }
+              : o,
+          ),
+        };
+      });
+      setResolved((r) =>
+        r ? { ...r, bonus: awarded, points: r.points + (awarded ? 1 : -1) } : r,
+      );
+    },
+    [activeBalloon],
+  );
 
-  const handleNext = useCallback(() => {
+  const leaveChallenge = useCallback(() => {
+    clearReactionTimers();
     setActiveBalloon(null);
     setResolved(null);
-    setShowNext(false);
-    setAvatarClip(null);
-    setScreen(sessionComplete(game) ? "results" : "wall");
-  }, [game, sessionComplete]);
-
-  const handleSkipQuestion = useCallback(() => {
-    // Damaged question: balloon stays used but no score is recorded.
-    setActiveBalloon(null);
-    setResolved(null);
-    setShowNext(false);
     setAvatarClip(null);
     setShowAdmin(false);
+  }, [clearReactionTimers]);
+
+  const handleReturn = useCallback(() => {
+    leaveChallenge();
     setScreen(sessionComplete(game) ? "results" : "wall");
-  }, [game, sessionComplete]);
+  }, [game, leaveChallenge, sessionComplete]);
+
+  /** Next Challenge: straight to the next unopened balloon in the same game. */
+  const handleNextChallenge = useCallback(() => {
+    if (!nextChallenge) return handleReturn();
+    setAvatarClip(null);
+    void sound.play("pop");
+    openChallenge(nextChallenge.balloon, 150);
+  }, [nextChallenge, handleReturn, openChallenge]);
+
+  const finishGame = useCallback(() => {
+    leaveChallenge();
+    setGame((g) => ({ ...g, finished: true }));
+    setScreen("results");
+  }, [leaveChallenge]);
 
   const resetGame = useCallback(() => {
     clearState();
     setGame({ ...initialGameState(settings.startingAvatar), phase: "running", startedAt: Date.now() });
     setActiveBalloon(null);
     setResolved(null);
-    setShowNext(false);
     setAvatarClip(null);
     setShowAdmin(false);
+    setBoardTab("picture");
     setScreen("wall");
   }, [settings.startingAvatar]);
 
@@ -286,6 +323,7 @@ export default function Game() {
       ...g,
       correctCount: 0,
       incorrectCount: 0,
+      points: 0,
       outcomes: [],
     }));
   }, []);
@@ -297,7 +335,7 @@ export default function Game() {
   if (!hydrated) {
     return (
       <main className="game-app items-center justify-center">
-        <p className="text-2xl font-black text-ren-navy">Loading…</p>
+        <p className="text-2xl font-black text-ink">Loading…</p>
       </main>
     );
   }
@@ -327,25 +365,27 @@ export default function Game() {
             />
             {screen === "wall" ? (
               <BalloonWall
-                totalBalloons={TOTAL_BALLOONS}
                 popped={game.poppedBalloons}
+                outcomes={game.outcomes}
                 locked={paused || game.phase === "idle"}
+                tab={boardTab}
+                onTab={setBoardTab}
                 onPop={handlePop}
               />
-            ) : activeQuestion && activeBalloon !== null ? (
-              <QuestionScreen
+            ) : activeChallenge && activeBalloon !== null ? (
+              <ChallengeScreen
                 key={activeBalloon}
-                question={activeQuestion}
-                balloonNumber={activeBalloon}
+                challenge={activeChallenge}
                 timerEnabled={settings.timerEnabled}
                 timerDuration={settings.timerDuration}
-                secondAttemptMode={settings.secondAttemptMode}
                 paused={paused}
                 resolved={resolved}
-                showNext={showNext}
                 avatarActive={avatarClip !== null}
+                hasNext={nextChallenge !== undefined}
                 onResolve={handleResolve}
-                onNext={handleNext}
+                onBonus={handleBonus}
+                onNext={handleNextChallenge}
+                onReturn={handleReturn}
               />
             ) : null}
           </>
@@ -354,7 +394,6 @@ export default function Game() {
         {screen === "results" && (
           <ResultsScreen
             state={game}
-            questions={questions}
             avatarsEnabled={settings.avatarVideosEnabled}
             confettiEnabled={settings.confettiEnabled}
             onRestart={resetGame}
@@ -369,7 +408,7 @@ export default function Game() {
       {avatarClip && (
         <AvatarOverlay
           clip={avatarClip}
-          onDone={handleAvatarDone}
+          onDone={() => undefined}
           allowSkip
           holdOnDone
         />
@@ -384,7 +423,7 @@ export default function Game() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 z-[95] -translate-x-1/2 rounded-2xl bg-ren-navy px-6 py-3 text-lg font-bold text-white shadow-panel">
+        <div className="fixed bottom-6 left-1/2 z-[95] -translate-x-1/2 rounded-2xl bg-ink px-6 py-3 text-lg font-bold text-white shadow-panel">
           {toast}
         </div>
       )}
@@ -413,13 +452,11 @@ export default function Game() {
           }}
           onMarkAnswer={(correct) => {
             setShowAdmin(false);
-            handleResolve(correct, correct ? "admin-correct" : "admin-wrong");
+            handleResolve(correct, { points: correct ? 1 : 0, bonus: false });
           }}
-          onSkipQuestion={handleSkipQuestion}
-          onReturnToWall={() => {
-            setShowAdmin(false);
-            handleNext();
-          }}
+          onSkipQuestion={handleReturn}
+          onReturnToWall={handleReturn}
+          onFinishGame={finishGame}
         />
       )}
     </main>

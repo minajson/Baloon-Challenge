@@ -1,77 +1,82 @@
-import { loadQuestionBank, sortByOrder } from "./questionStore";
+import { CATEGORIES, CHALLENGES, featurePoints } from "@/data/challenges";
 import type {
   CategoryStat,
+  Challenge,
   GameState,
-  Question,
-  QuestionMode,
+  OddChallenge,
 } from "./types";
 
-/** The playable pool: active questions from the managed bank, in order. */
-export function activeQuestions(): Question[] {
-  return sortByOrder(loadQuestionBank().filter((q) => q.active));
+/** The playable pool: all 80 NAPE challenges, in balloon order. */
+export function activeChallenges(): Challenge[] {
+  return CHALLENGES;
 }
 
 /**
- * Resolve the question already assigned to a balloon in this session.
- * Assignments are recorded in GameState so a refresh restores them and a
- * question can never be served twice in one session.
+ * The challenge assigned to a balloon in this session. Balloon n always opens
+ * challenge n (fixed assignment), recorded in GameState so a refresh restores
+ * it and a challenge can never be served twice in one session.
  */
-export function assignedQuestion(
-  questions: Question[],
+export function assignedChallenge(
+  challenges: Challenge[],
   state: GameState,
   balloonNumber: number,
-): Question | undefined {
+): Challenge | undefined {
   const id = state.assignments[String(balloonNumber)];
-  return id ? questions.find((q) => q.id === id) : undefined;
+  return id ? challenges.find((c) => c.id === id) : undefined;
 }
 
-/**
- * Pick the question for a freshly popped balloon according to the question
- * mode. Returns undefined when no unused question is available.
- *
- * - fixed:      the question whose balloonNumber matches the balloon.
- * - sequential: the next unused question by display order.
- * - random:     a random unused question.
- */
-export function pickQuestionForBalloon(
-  questions: Question[],
+export function challengeForBalloon(
+  challenges: Challenge[],
   state: GameState,
-  mode: QuestionMode,
   balloonNumber: number,
-): Question | undefined {
-  const existing = assignedQuestion(questions, state, balloonNumber);
+): Challenge | undefined {
+  const existing = assignedChallenge(challenges, state, balloonNumber);
   if (existing) return existing;
-  const usedIds = new Set(Object.values(state.assignments));
-  const unused = questions.filter((q) => !usedIds.has(q.id));
-  if (mode === "fixed") {
-    return unused.find((q) => q.balloonNumber === balloonNumber);
-  }
-  if (mode === "sequential") {
-    return unused[0];
-  }
-  if (unused.length === 0) return undefined;
-  return unused[Math.floor(Math.random() * unused.length)];
+  const used = new Set(Object.values(state.assignments));
+  return challenges.find((c) => c.balloon === balloonNumber && !used.has(c.id));
 }
 
-export function categoryStats(
-  questions: Question[],
+/** The next unopened balloon after `from` within the same game, if any. */
+export function nextUnopenedInCategory(
+  challenges: Challenge[],
   state: GameState,
-): CategoryStat[] {
-  const byCategory = new Map<string, { correct: number; total: number }>();
-  state.outcomes.forEach((o) => {
-    const entry = byCategory.get(o.category) ?? { correct: 0, total: 0 };
-    entry.total += 1;
-    if (o.correct) entry.correct += 1;
-    byCategory.set(o.category, entry);
-  });
-  return [...byCategory.entries()]
-    .map(([category, { correct, total }]) => ({
-      category,
+  from: number,
+): Challenge | undefined {
+  const current = challenges.find((c) => c.balloon === from);
+  if (!current) return undefined;
+  const popped = new Set(state.poppedBalloons);
+  const inType = challenges.filter((c) => c.type === current.type);
+  const after = inType.filter((c) => c.balloon > from && !popped.has(c.balloon));
+  if (after.length > 0) return after[0];
+  return inType.find((c) => !popped.has(c.balloon));
+}
+
+/** Base points for a correct attempt (bonus is awarded separately). */
+export function basePoints(
+  challenge: Challenge,
+  cluesRevealed: number,
+): number {
+  return challenge.type === "feature" ? featurePoints(cluesRevealed) : 1;
+}
+
+export const BONUS_POINTS = 1;
+
+export function supportsBonus(challenge: Challenge): challenge is OddChallenge {
+  return challenge.type === "odd";
+}
+
+export function categoryStats(state: GameState): CategoryStat[] {
+  return CATEGORIES.map((cat) => {
+    const rows = state.outcomes.filter((o) => o.category === cat.name);
+    const correct = rows.filter((o) => o.correct).length;
+    return {
+      category: cat.name,
       correct,
-      total,
-      accuracy: total === 0 ? 0 : Math.round((correct / total) * 100),
-    }))
-    .sort((a, b) => b.accuracy - a.accuracy);
+      total: rows.length,
+      accuracy: rows.length === 0 ? 0 : Math.round((correct / rows.length) * 100),
+      points: rows.reduce((sum, o) => sum + o.points, 0),
+    };
+  }).filter((s) => s.total > 0).sort((a, b) => b.accuracy - a.accuracy);
 }
 
 export function accuracyPercent(state: GameState): number {

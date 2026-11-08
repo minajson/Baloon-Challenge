@@ -58,7 +58,7 @@ export default function Timer({
       </svg>
       <span
         className={`absolute inset-0 flex items-center justify-center text-xl font-black tabular-nums lg:text-2xl ${
-          critical ? "text-alert-red" : "text-ren-navy"
+          critical ? "text-bad" : "text-ink"
         }`}
       >
         {secondsLeft}

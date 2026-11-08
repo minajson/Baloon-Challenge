@@ -1,8 +1,8 @@
 /*
- * Offline service worker for the Pop the Balloon Challenge.
+ * Offline service worker for NAPE 2026 Geoscience Games.
  *
  * Strategy:
- *  - Install: precache the app shell and every game asset (logos, mascots,
+ *  - Install: precache the app shell and every game asset (icons, mascots, photos,
  *    mascot videos, ElevenLabs audio, sound effects, music) so the whole
  *    game plays with no internet after one online visit.
  *  - Navigations: network-first with cache fallback, so updates arrive when
@@ -13,9 +13,11 @@
  *    payloads (e.g. /admin/questions.txt) — network-first with cache
  *    fallback. Serving those cache-first breaks <Link> navigation after a
  *    redeploy (a stale payload from the previous build makes clicks like
- *    "Manage Questions" silently fail).
+ *    "View All Challenges" silently fail).
  */
-const VERSION = "balloon-challenge-v2";
+// Bumping this name drops every older cache on activation, so no stale
+// media (e.g. previous mascot videos) can be served after an update.
+const VERSION = "nape-geoscience-games-v1";
 const CACHE = `${VERSION}`;
 
 /** Only these are safe to serve cache-first: content-addressed or static. */
@@ -25,13 +27,14 @@ const PRECACHE = [
   "/",
   "/admin/questions/",
   "/manifest.webmanifest",
-  "/questions-template.csv",
-  // Branding
-  "/media/images/renaissance-logo.png",
-  "/media/images/spe_logo.png",
+  "/icon.svg",
+  "/media/images/app-icon-192.png",
+  "/media/images/app-icon-512.png",
   // Mascot master images
-  "/media/images/RENAISSANCE_MALE_MASCOT_MASTER.png",
-  "/media/images/RENAISSANCE_FEMALE_MASCOT_MASTER.png",
+  "/media/images/MASCOT_MALE_MASTER.png",
+  "/media/images/MASCOT_FEMALE_MASTER.png",
+  // Game 4 photographs
+  ...Array.from({ length: 20 }, (_, i) => `/media/photos/feature-${String(i + 1).padStart(2, "0")}.jpg`),
   // Mascot videos
   "/media/avatars/male/male_correct_01.mp4",
   "/media/avatars/male/male_correct_02.mp4",

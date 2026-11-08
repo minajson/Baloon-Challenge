@@ -1,13 +1,17 @@
 {
-  "name": "pop-the-balloon-challenge",
+  "name": "nape-2026-geoscience-games",
   "version": "1.0.0",
   "private": true,
-  "description": "Pop the Balloon Challenge — interactive balloon safety game for live events",
+  "description": "NAPE 2026 Geoscience Games \u2014 interactive balloon game for live events",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "validate": "node scripts/validate-content.mjs",
+    "test:e2e": "node scripts/e2e.mjs",
+    "check": "npm run lint && npm run typecheck && npm run validate",
     "sfx": "node scripts/generate-sfx.mjs",
     "music": "node scripts/generate-music.mjs"
   },
@@ -25,6 +29,7 @@
     "@types/react-dom": "^19.2.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.0.0",
+    "playwright-core": "^1.65.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.0"
   }

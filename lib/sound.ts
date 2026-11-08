@@ -24,11 +24,9 @@ const SFX_FILES: Record<SfxName, string> = {
   click: "/media/sfx/click.wav",
 };
 
-// Prefer a licensed .mp3 if present; fall back to the generated .wav loop.
-const MUSIC_FILES = [
-  "/media/audio/background-music.mp3",
-  "/media/audio/background-music.wav",
-];
+// The generated .wav loop. To use a licensed track instead, add its path
+// BEFORE the .wav here and ship the file (a missing file would be a 404).
+const MUSIC_FILES = ["/media/audio/background-music.wav"];
 
 class SoundManager {
   private ctx: AudioContext | null = null;

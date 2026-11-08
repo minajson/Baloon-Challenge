@@ -1,54 +1,65 @@
-# Event Operator Guide — Pop the Balloon Challenge
+# Event Operator Guide — NAPE 2026 Geoscience Games
 
 ## Before doors open
 
-1. Open the game on the event machine (`npm run dev`, or serve the `out/`
-   folder after `npm run build`).
-2. Press **Full Screen** on the opening screen (or F11 in most browsers).
+1. Open the game on the event machine (serve the `out/` folder after
+   `npm run build`, or use the deployed URL).
+2. Press **Full Screen** on the opening screen (or F11).
 3. Press **Sound Test** and confirm pop / cheer / fanfare through the PA.
-4. Open **⚙ Admin** (no PIN required) and set:
-   - Timer on/off and duration (default 30 s),
-   - Sound, confetti, avatar videos, background music,
-   - Starting avatar (male or female).
-5. Preview both avatars (correct + wrong responses) from the Admin panel.
-6. If the official question set is ready, import the CSV now
-   (Admin → Questions → Import) — see `REPLACING-QUESTIONS.md`.
-7. Press **Start Game**.
+4. Open **⚙ Admin** (no PIN) and set the challenge timer (default 45 s,
+   used for Games 1–3), sound, confetti, host videos and music.
+5. Press **Start Game**.
 
-## During the event
+## Running a challenge
 
-- One participant walks up, calls or taps a balloon number.
-- The balloon pops, the question appears, they choose A–D.
-- The mascot reacts; press **Next Participant** (or Enter) to return to the
-  wall. The male/female mascots alternate automatically.
-- Keyboard shortcuts on the question screen: **A–D** or **1–4** to answer,
-  **Enter** for next participant.
+The facilitator bar under every challenge holds all the controls. It never
+shows an answer, so it is safe on the projected screen.
 
-### Troubleshooting mid-game
+| Control | When it appears | What it does |
+| --- | --- | --- |
+| Pop a balloon | Board | Pick a game tab, then click a balloon (it numbers 1–20 inside each game) |
+| 💡 Show Hint | Missing Letters | Shows the original hint (players can also tap the Hint button) |
+| 🔎 Reveal Clue | Guess the Feature | Reveals clues one at a time — worth 3, then 2, then 1 point |
+| 👁 Reveal Answer | Always | Shows the correct answer. Nothing reveals it earlier |
+| 📖 Reveal Why | Odd One Out | After the answer, shows the original explanation |
+| ✓ Correct / ✕ Not Quite | After the answer is revealed | Records the result, updates the score, triggers the host reaction |
+| ★ Award Bonus Point | Odd One Out | +1 for a correct reason. Never automatic. Can be toggled off again |
+| Next Challenge ▸ | After marking | Pops the next unopened balloon in the same game |
+| 🎈 Return to Board | Always | Back to the board (leaving before marking scores nothing) |
+
+Tips:
+
+- **Missing Letters:** players tap a blank, then tap letters (or type). They
+  can change letters freely until the answer is revealed.
+- **Odd One Out:** players can also press **1–4** to select a card.
+- **Guess the Feature:** the photo is shown with no caption. The credit line
+  appears only after the answer is revealed. If time is short, mark Correct
+  with 0 or 1 clues shown for the full 3 points.
+- The timer (Games 1–3) never marks anything when it runs out — it shows
+  “Time's up!” and the facilitator decides. Game 4 has no timer.
+
+## Troubleshooting
 
 | Problem | Fix |
 | --- | --- |
-| Question is wrong/damaged | Admin → Current Question → **Skip Damaged Question** (no score recorded) |
-| Participant answered aloud but clicked wrong button | Admin → **Mark Correct** / **Mark Incorrect** before an option is chosen |
-| Need a break | Admin → **Pause Game** (balloons lock, timer freezes) |
-| Browser refreshed accidentally | Opening screen → **Resume Previous Game** — nothing is lost |
-| Avatar video won’t play | The game automatically falls back to the mascot image + recorded voice, then to on-screen text. You can also disable avatar videos in Admin. |
-| No sound | Check the Admin sound toggle first, then the machine/PA volume. Sounds only start after the first click on the page (browser rule). |
+| Marked the wrong result | ⚙ Admin → Reset Event Score is the only undo; avoid by revealing first, marking second |
+| Need a break | ⚙ Admin → **Pause Game** (balloons lock, timer freezes) |
+| Browser refreshed | Opening screen → **Resume Previous Game** — nothing is lost |
+| A host video won't play | The game falls back to the host image + recorded voice, then on-screen text. Skip ▸ always works; videos can be disabled in Admin |
+| No sound | Check the Admin sound toggle, then machine/PA volume. Browsers only start sound after the first click |
+| Want to see all answers | ⚙ Admin → **View All 80 Challenges** (facilitator only) |
 
-- A stuck avatar clip can always be skipped with the small **Skip ▸** button.
+## Ending the game
 
-## After the last balloon
-
-- The results screen appears automatically: totals, accuracy and the
-  strongest / needs-more-awareness safety categories, plus both mascots’
-  final message: *“Well done, everyone! Remember to always stay safe!”*
-- Press **Export Results** to download a CSV (per-balloon outcomes) and a
-  JSON summary.
-- **Restart Game** resets all 50 balloons for another session (a
-  confirmation is required for resets from the Admin panel).
+- ⚙ Admin → **End Game & View Results** shows totals, points, and each
+  game's results with the host celebration. It also appears automatically
+  after balloon 80.
+- **Export Results** downloads a CSV (per-balloon outcomes with points and
+  bonus) and a JSON summary.
+- **Restart Game** brings all 80 balloons back (Admin resets ask first).
 
 ## Golden rules
 
-- The game never collects names — keep it that way.
-- Never announce “failure”; the game language is deliberately encouraging.
-- Keep the machine offline-safe: everything runs locally, no internet needed.
+- The game never collects names.
+- Keep language encouraging — “Not Quite”, never “wrong”.
+- Everything runs locally; no internet is needed once loaded.

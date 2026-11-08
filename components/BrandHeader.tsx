@@ -1,21 +1,16 @@
 "use client";
 
+import Emblem from "./Emblem";
+
+export const GAME_TITLE = "NAPE 2026 GEOSCIENCE GAMES";
+
 /**
- * Compact event header:
- *
- *   [ RENAISSANCE LOGO ]   [ POP THE BALLOON CHALLENGE ]   [ SPE LOGO ]
+ * Compact event header:  [ emblem ]   [ NAPE 2026 GEOSCIENCE GAMES ]   [ ]
  *
  * Layout lives in the plain-CSS `.game-header` / `.brand-title` rules in
  * globals.css (grid with minmax columns keeps the title truly centred and
- * shrinkable; logos are height/width capped with object-fit: contain so
- * they are never cropped or stretched at any viewport size).
+ * shrinkable at any viewport size).
  */
-
-export const LOGOS = {
-  renaissance: "/media/images/renaissance-logo.png",
-  spe: "/media/images/spe_logo.png",
-} as const;
-
 export default function BrandHeader({
   showTitle = true,
 }: {
@@ -24,21 +19,15 @@ export default function BrandHeader({
 }) {
   return (
     <header className="game-header">
-      <div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={LOGOS.renaissance} alt="Renaissance logo" draggable={false} />
-      </div>
+      <div>{showTitle && <Emblem className="brand-emblem" />}</div>
       {showTitle ? (
-        <h1 className="brand-title text-ren-navy">
-          POP THE <span className="text-ren-orange">BALLOON</span> CHALLENGE
+        <h1 className="brand-title text-ink">
+          <span className="text-terra">NAPE 2026</span> GEOSCIENCE GAMES
         </h1>
       ) : (
         <span aria-hidden="true" />
       )}
-      <div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={LOGOS.spe} alt="SPE International logo" draggable={false} />
-      </div>
+      <span aria-hidden="true" />
     </header>
   );
 }

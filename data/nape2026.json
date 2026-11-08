@@ -1,0 +1,1111 @@
+{
+  "source": {
+    "title": "NAPE 2026 Geoscience Games",
+    "preparedBy": "Olem Oruene",
+    "date": "2026-11-04"
+  },
+  "categories": [
+    {
+      "id": "picture",
+      "name": "Picture Puzzles",
+      "game": 1
+    },
+    {
+      "id": "letters",
+      "name": "Missing Letters",
+      "game": 2
+    },
+    {
+      "id": "odd",
+      "name": "Odd One Out",
+      "game": 3
+    },
+    {
+      "id": "feature",
+      "name": "Guess the Geological Feature",
+      "game": 4
+    }
+  ],
+  "challenges": [
+    {
+      "id": "pp-01",
+      "balloon": 1,
+      "n": 1,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A small heap of golden beach sand",
+      "panelB": "A single grey stone",
+      "answer": "Sandstone"
+    },
+    {
+      "id": "pp-02",
+      "balloon": 2,
+      "n": 2,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A green lime fruit, cut in half",
+      "panelB": "A single grey stone",
+      "answer": "Limestone"
+    },
+    {
+      "id": "pp-03",
+      "balloon": 3,
+      "n": 3,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A puddle of brown mud",
+      "panelB": "A single grey stone",
+      "answer": "Mudstone"
+    },
+    {
+      "id": "pp-04",
+      "balloon": 4,
+      "n": 4,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A bed with pillow and blanket",
+      "panelB": "A large rock",
+      "answer": "Bedrock"
+    },
+    {
+      "id": "pp-05",
+      "balloon": 5,
+      "n": 5,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A drop of black oil",
+      "panelB": "A green open field",
+      "answer": "Oilfield"
+    },
+    {
+      "id": "pp-06",
+      "balloon": 6,
+      "n": 6,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Medium",
+      "panelA": "A salt shaker spilling salt",
+      "panelB": "A domed roof (e.g. a mosque or observatory dome)",
+      "answer": "Salt dome"
+    },
+    {
+      "id": "pp-07",
+      "balloon": 7,
+      "n": 7,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "Planet Earth (globe)",
+      "panelB": "A duck with a speech bubble saying QUACK",
+      "answer": "Earthquake"
+    },
+    {
+      "id": "pp-08",
+      "balloon": 8,
+      "n": 8,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Medium",
+      "panelA": "A pot of black paint",
+      "panelB": "A gold bar",
+      "answer": "Black gold (crude oil)"
+    },
+    {
+      "id": "pp-09",
+      "balloon": 9,
+      "n": 9,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A smoking pipe",
+      "panelB": "A straight ruled line",
+      "answer": "Pipeline"
+    },
+    {
+      "id": "pp-10",
+      "balloon": 10,
+      "n": 10,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A power drill",
+      "panelB": "TEXT: BIT",
+      "answer": "Drill bit"
+    },
+    {
+      "id": "pp-11",
+      "balloon": 11,
+      "n": 11,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Hard",
+      "panelA": "A gas cylinder",
+      "panelB": "A baseball cap",
+      "answer": "Gas cap"
+    },
+    {
+      "id": "pp-12",
+      "balloon": 12,
+      "n": 12,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Medium",
+      "panelA": "A stack of magazines labelled MAG",
+      "panelB": "A smiling mother with TEXT: MA",
+      "answer": "Magma"
+    },
+    {
+      "id": "pp-13",
+      "balloon": 13,
+      "n": 13,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A flame or a thermometer in red",
+      "panelB": "A metal coiled spring",
+      "answer": "Hot spring"
+    },
+    {
+      "id": "pp-14",
+      "balloon": 14,
+      "n": 14,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Easy",
+      "panelA": "A patch of land on a map",
+      "panelB": "A children's playground slide",
+      "answer": "Landslide"
+    },
+    {
+      "id": "pp-15",
+      "balloon": 15,
+      "n": 15,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Medium",
+      "panelA": "Sea waves",
+      "panelB": "A spirit level (bubble level tool)",
+      "answer": "Sea level"
+    },
+    {
+      "id": "pp-16",
+      "balloon": 16,
+      "n": 16,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Medium",
+      "panelA": "A glass of water",
+      "panelB": "A wooden table",
+      "answer": "Water table"
+    },
+    {
+      "id": "pp-17",
+      "balloon": 17,
+      "n": 17,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Medium",
+      "panelA": "A light switch marked OFF",
+      "panelB": "A beach shoreline",
+      "answer": "Offshore"
+    },
+    {
+      "id": "pp-18",
+      "balloon": 18,
+      "n": 18,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Medium",
+      "panelA": "A traditional water well with bucket",
+      "panelB": "A human head (side profile)",
+      "answer": "Wellhead"
+    },
+    {
+      "id": "pp-19",
+      "balloon": 19,
+      "n": 19,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Medium",
+      "panelA": "A yawning, bored person",
+      "panelB": "A hole in the ground",
+      "answer": "Borehole"
+    },
+    {
+      "id": "pp-20",
+      "balloon": 20,
+      "n": 20,
+      "type": "picture",
+      "category": "Picture Puzzles",
+      "level": "Hard",
+      "panelA": "A flooded street",
+      "panelB": "An aeroplane",
+      "answer": "Floodplain"
+    },
+    {
+      "id": "ml-01",
+      "balloon": 21,
+      "n": 1,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Easy",
+      "pattern": "F _ S S _ L",
+      "hint": "Remains of ancient life preserved in rock",
+      "answer": "FOSSIL"
+    },
+    {
+      "id": "ml-02",
+      "balloon": 22,
+      "n": 2,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Easy",
+      "pattern": "B A S _ L _",
+      "hint": "Dark volcanic rock",
+      "answer": "BASALT"
+    },
+    {
+      "id": "ml-03",
+      "balloon": 23,
+      "n": 3,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Easy",
+      "pattern": "Q U _ R T _",
+      "hint": "The most common mineral in beach sand",
+      "answer": "QUARTZ"
+    },
+    {
+      "id": "ml-04",
+      "balloon": 24,
+      "n": 4,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Easy",
+      "pattern": "E R _ S I _ N",
+      "hint": "Wearing away of land by water, wind or ice",
+      "answer": "EROSION"
+    },
+    {
+      "id": "ml-05",
+      "balloon": 25,
+      "n": 5,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Easy",
+      "pattern": "S E _ S M _ C",
+      "hint": "Type of survey using sound waves to image the subsurface",
+      "answer": "SEISMIC"
+    },
+    {
+      "id": "ml-06",
+      "balloon": 26,
+      "n": 6,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Easy",
+      "pattern": "S _ D _ M E N _",
+      "hint": "Loose grains carried and laid down by rivers and seas",
+      "answer": "SEDIMENT"
+    },
+    {
+      "id": "ml-07",
+      "balloon": 27,
+      "n": 7,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Easy",
+      "pattern": "S Y N C _ _ N E",
+      "hint": "A U-shaped, downward fold",
+      "answer": "SYNCLINE"
+    },
+    {
+      "id": "ml-08",
+      "balloon": 28,
+      "n": 8,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Medium",
+      "pattern": "A N T _ C L _ N E",
+      "hint": "An arch-shaped fold and a classic oil trap",
+      "answer": "ANTICLINE"
+    },
+    {
+      "id": "ml-09",
+      "balloon": 29,
+      "n": 9,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Medium",
+      "pattern": "K E R _ G E _",
+      "hint": "Organic matter in source rock that turns into oil and gas",
+      "answer": "KEROGEN"
+    },
+    {
+      "id": "ml-10",
+      "balloon": 30,
+      "n": 10,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Medium",
+      "pattern": "P _ R O S _ T Y",
+      "hint": "The pore space in a rock",
+      "answer": "POROSITY"
+    },
+    {
+      "id": "ml-11",
+      "balloon": 31,
+      "n": 11,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Medium",
+      "pattern": "M I G R _ T I _ N",
+      "hint": "Movement of oil from source rock to reservoir",
+      "answer": "MIGRATION"
+    },
+    {
+      "id": "ml-12",
+      "balloon": 32,
+      "n": 12,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Medium",
+      "pattern": "R E S _ R V _ _ R",
+      "hint": "Rock that stores oil or gas",
+      "answer": "RESERVOIR"
+    },
+    {
+      "id": "ml-13",
+      "balloon": 33,
+      "n": 13,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Medium",
+      "pattern": "E V _ P O R _ T E",
+      "hint": "Rock formed when seawater dries up, e.g. rock salt",
+      "answer": "EVAPORITE"
+    },
+    {
+      "id": "ml-14",
+      "balloon": 34,
+      "n": 14,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Hard",
+      "pattern": "T U R B _ D _ T E",
+      "hint": "Deposit from an underwater sediment avalanche",
+      "answer": "TURBIDITE"
+    },
+    {
+      "id": "ml-15",
+      "balloon": 35,
+      "n": 15,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Hard",
+      "pattern": "H Y D _ O C A R _ O N",
+      "hint": "Compound of hydrogen and carbon",
+      "answer": "HYDROCARBON"
+    },
+    {
+      "id": "ml-16",
+      "balloon": 36,
+      "n": 16,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Hard",
+      "pattern": "D I _ G E N _ S I S",
+      "hint": "Changes that turn sediment into rock after burial",
+      "answer": "DIAGENESIS"
+    },
+    {
+      "id": "ml-17",
+      "balloon": 37,
+      "n": 17,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Hard",
+      "pattern": "C O N G L _ M E R _ T E",
+      "hint": "Sedimentary rock made of rounded pebbles",
+      "answer": "CONGLOMERATE"
+    },
+    {
+      "id": "ml-18",
+      "balloon": 38,
+      "n": 18,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Hard",
+      "pattern": "U N C _ N F O R M _ T Y",
+      "hint": "A buried erosion surface marking a time gap",
+      "answer": "UNCONFORMITY"
+    },
+    {
+      "id": "ml-19",
+      "balloon": 39,
+      "n": 19,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Hard",
+      "pattern": "P E R M _ A B _ L _ T Y",
+      "hint": "How easily fluids flow through a rock",
+      "answer": "PERMEABILITY"
+    },
+    {
+      "id": "ml-20",
+      "balloon": 40,
+      "n": 20,
+      "type": "letters",
+      "category": "Missing Letters",
+      "level": "Hard",
+      "pattern": "S T R _ T I G R _ P H Y",
+      "hint": "Study of rock layers and their order",
+      "answer": "STRATIGRAPHY"
+    },
+    {
+      "id": "oo-01",
+      "balloon": 41,
+      "n": 1,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Easy",
+      "options": [
+        "Sandstone",
+        "Shale",
+        "Limestone",
+        "Granite"
+      ],
+      "answer": "Granite",
+      "why": "Igneous; the others are sedimentary"
+    },
+    {
+      "id": "oo-02",
+      "balloon": 42,
+      "n": 2,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Easy",
+      "options": [
+        "Basalt",
+        "Granite",
+        "Obsidian",
+        "Marble"
+      ],
+      "answer": "Marble",
+      "why": "Metamorphic; the others are igneous"
+    },
+    {
+      "id": "oo-03",
+      "balloon": 43,
+      "n": 3,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Easy",
+      "options": [
+        "Niger Delta",
+        "Nile Delta",
+        "Mississippi Delta",
+        "Grand Canyon"
+      ],
+      "answer": "Grand Canyon",
+      "why": "Carved by erosion; the others are deltas built by deposition"
+    },
+    {
+      "id": "oo-04",
+      "balloon": 44,
+      "n": 4,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Easy",
+      "options": [
+        "Quartz",
+        "Feldspar",
+        "Mica",
+        "Coal"
+      ],
+      "answer": "Coal",
+      "why": "An organic rock; the others are minerals"
+    },
+    {
+      "id": "oo-05",
+      "balloon": 45,
+      "n": 5,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Easy",
+      "options": [
+        "Methane",
+        "Ethane",
+        "Propane",
+        "Carbon dioxide"
+      ],
+      "answer": "Carbon dioxide",
+      "why": "Not a hydrocarbon"
+    },
+    {
+      "id": "oo-06",
+      "balloon": 46,
+      "n": 6,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Stalactite",
+        "Stalagmite",
+        "Flowstone",
+        "Moraine"
+      ],
+      "answer": "Moraine",
+      "why": "Glacial deposit; the others form in caves"
+    },
+    {
+      "id": "oo-07",
+      "balloon": 47,
+      "n": 7,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Mohs",
+        "Richter",
+        "Mercalli",
+        "Moment magnitude"
+      ],
+      "answer": "Mohs",
+      "why": "Measures mineral hardness; the others measure earthquakes"
+    },
+    {
+      "id": "oo-08",
+      "balloon": 48,
+      "n": 8,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Diamond",
+        "Graphite",
+        "Coal",
+        "Quartz"
+      ],
+      "answer": "Quartz",
+      "why": "Silicon dioxide; the others are carbon or carbon-rich"
+    },
+    {
+      "id": "oo-09",
+      "balloon": 49,
+      "n": 9,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Anticline",
+        "Syncline",
+        "Monocline",
+        "Delta"
+      ],
+      "answer": "Delta",
+      "why": "A landform; the others are folds"
+    },
+    {
+      "id": "oo-10",
+      "balloon": 50,
+      "n": 10,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Normal fault",
+        "Reverse fault",
+        "Strike-slip fault",
+        "Unconformity"
+      ],
+      "answer": "Unconformity",
+      "why": "A time gap in the rock record, not a fault"
+    },
+    {
+      "id": "oo-11",
+      "balloon": 51,
+      "n": 11,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Porosity",
+        "Permeability",
+        "Water saturation",
+        "Magnitude"
+      ],
+      "answer": "Magnitude",
+      "why": "Earthquake size; the others are reservoir properties"
+    },
+    {
+      "id": "oo-12",
+      "balloon": 52,
+      "n": 12,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Meander",
+        "Oxbow lake",
+        "Point bar",
+        "Barchan"
+      ],
+      "answer": "Barchan",
+      "why": "A desert dune; the others are river features"
+    },
+    {
+      "id": "oo-13",
+      "balloon": 53,
+      "n": 13,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Halite",
+        "Gypsum",
+        "Anhydrite",
+        "Pyrite"
+      ],
+      "answer": "Pyrite",
+      "why": "A sulphide; the others are evaporite minerals"
+    },
+    {
+      "id": "oo-14",
+      "balloon": 54,
+      "n": 14,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Medium",
+      "options": [
+        "Weathering",
+        "Erosion",
+        "Deposition",
+        "Subduction"
+      ],
+      "answer": "Subduction",
+      "why": "A plate-tectonic process; the others are steps in the sediment cycle"
+    },
+    {
+      "id": "oo-15",
+      "balloon": 55,
+      "n": 15,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Hard",
+      "options": [
+        "Jurassic",
+        "Cretaceous",
+        "Triassic",
+        "Eocene"
+      ],
+      "answer": "Eocene",
+      "why": "Cenozoic; the others are Mesozoic periods"
+    },
+    {
+      "id": "oo-16",
+      "balloon": 56,
+      "n": 16,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Hard",
+      "options": [
+        "Source rock",
+        "Reservoir rock",
+        "Seal",
+        "Aquifer"
+      ],
+      "answer": "Aquifer",
+      "why": "A groundwater store; the others are petroleum system elements"
+    },
+    {
+      "id": "oo-17",
+      "balloon": 57,
+      "n": 17,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Hard",
+      "options": [
+        "Anambra Basin",
+        "Benue Trough",
+        "Chad Basin",
+        "Jos Plateau"
+      ],
+      "answer": "Jos Plateau",
+      "why": "Granite and volcanic upland; the others are Nigerian sedimentary basins"
+    },
+    {
+      "id": "oo-18",
+      "balloon": 58,
+      "n": 18,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Hard",
+      "options": [
+        "Gamma ray",
+        "Resistivity",
+        "Sonic",
+        "Seismic reflection"
+      ],
+      "answer": "Seismic reflection",
+      "why": "A surface survey; the others are well logs"
+    },
+    {
+      "id": "oo-19",
+      "balloon": 59,
+      "n": 19,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Hard",
+      "options": [
+        "Foraminifera",
+        "Pollen",
+        "Ostracods",
+        "Zircon"
+      ],
+      "answer": "Zircon",
+      "why": "A mineral; the others are microfossils used to date rocks"
+    },
+    {
+      "id": "oo-20",
+      "balloon": 60,
+      "n": 20,
+      "type": "odd",
+      "category": "Odd One Out",
+      "level": "Hard",
+      "options": [
+        "Slate",
+        "Gneiss",
+        "Schist",
+        "Conglomerate"
+      ],
+      "answer": "Conglomerate",
+      "why": "Sedimentary; the others are metamorphic"
+    },
+    {
+      "id": "gf-01",
+      "balloon": 61,
+      "n": 1,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I form where a river slows and drops its load into the sea",
+        "I am shaped like a Greek letter",
+        "Nigeria's oil and gas heartland is one of the world's largest of me"
+      ],
+      "answer": "Delta",
+      "photoBrief": "Aerial or satellite view of a river delta fanning into the sea (e.g. Niger Delta)",
+      "photo": "/media/photos/feature-01.jpg"
+    },
+    {
+      "id": "gf-02",
+      "balloon": 62,
+      "n": 2,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I am shallow coastal water cut off from the open sea by a sand barrier",
+        "Ferries cross me daily in a big Nigerian city",
+        "Third Mainland Bridge spans me"
+      ],
+      "answer": "Lagoon",
+      "photoBrief": "Lagos Lagoon from above, or any lagoon behind a barrier beach",
+      "photo": "/media/photos/feature-02.jpg"
+    },
+    {
+      "id": "gf-03",
+      "balloon": 63,
+      "n": 3,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "My name is German for \"island mountain\"",
+        "I am a lone rock dome rising from a flat plain",
+        "Zuma Rock near Abuja is a famous example"
+      ],
+      "answer": "Inselberg",
+      "photoBrief": "Zuma Rock, or any bare granite dome on a plain",
+      "photo": "/media/photos/feature-03.jpg"
+    },
+    {
+      "id": "gf-04",
+      "balloon": 64,
+      "n": 4,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "Wind builds me grain by grain",
+        "I can walk across a desert, metres per year",
+        "The Sahara is full of me"
+      ],
+      "answer": "Sand dune",
+      "photoBrief": "Crescent-shaped dune in a desert",
+      "photo": "/media/photos/feature-04.jpg"
+    },
+    {
+      "id": "gf-05",
+      "balloon": 65,
+      "n": 5,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I form where hard rock sits over soft rock in a river",
+        "Gurara and Erin-Ijesha in Nigeria are examples",
+        "Water falls straight down over me"
+      ],
+      "answer": "Waterfall",
+      "photoBrief": "Waterfall in a forest setting",
+      "photo": "/media/photos/feature-05.jpg"
+    },
+    {
+      "id": "gf-06",
+      "balloon": 66,
+      "n": 6,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "A river cut me down over millions of years",
+        "I expose rock layers like pages in a book",
+        "The Grand Canyon is the most famous one"
+      ],
+      "answer": "Canyon",
+      "photoBrief": "Steep, layered canyon walls with a river at the bottom",
+      "photo": "/media/photos/feature-06.jpg"
+    },
+    {
+      "id": "gf-07",
+      "balloon": 67,
+      "n": 7,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "Dripping water and calcite built me over thousands of years",
+        "I live in limestone caves",
+        "I hang tight from the ceiling"
+      ],
+      "answer": "Stalactite",
+      "photoBrief": "Cave ceiling with icicle-like formations",
+      "photo": "/media/photos/feature-07.jpg"
+    },
+    {
+      "id": "gf-08",
+      "balloon": 68,
+      "n": 8,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I form when limestone dissolves underground",
+        "I can appear suddenly and swallow roads or houses",
+        "I am a hole that the ground sinks into"
+      ],
+      "answer": "Sinkhole",
+      "photoBrief": "Circular collapse hole in a field or road",
+      "photo": "/media/photos/feature-08.jpg"
+    },
+    {
+      "id": "gf-09",
+      "balloon": 69,
+      "n": 9,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I was once part of a river",
+        "A meander was cut off and left me behind",
+        "I am a lake shaped like a horseshoe"
+      ],
+      "answer": "Oxbow lake",
+      "photoBrief": "Aerial view of a curved lake beside a winding river",
+      "photo": "/media/photos/feature-09.jpg"
+    },
+    {
+      "id": "gf-10",
+      "balloon": 70,
+      "n": 10,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I form where a fast mountain stream reaches flat ground",
+        "I spread out in a cone of gravel and sand",
+        "I look like an open hand fan at a mountain's foot"
+      ],
+      "answer": "Alluvial fan",
+      "photoBrief": "Fan-shaped deposit at a mountain front (e.g. Death Valley)",
+      "photo": "/media/photos/feature-10.jpg"
+    },
+    {
+      "id": "gf-11",
+      "balloon": 71,
+      "n": 11,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I form where the crust is being pulled apart",
+        "My floor dropped down between two faults",
+        "East Africa has the most famous one"
+      ],
+      "answer": "Rift valley",
+      "photoBrief": "Wide valley with steep fault walls (e.g. East African Rift)",
+      "photo": "/media/photos/feature-11.jpg"
+    },
+    {
+      "id": "gf-12",
+      "balloon": 72,
+      "n": 12,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I am a step in the land",
+        "I formed when the ground broke and one side moved",
+        "Earthquakes can create me in seconds"
+      ],
+      "answer": "Fault scarp",
+      "photoBrief": "Clear step or cliff along a fault line",
+      "photo": "/media/photos/feature-12.jpg"
+    },
+    {
+      "id": "gf-13",
+      "balloon": 73,
+      "n": 13,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "Compression bent rock layers to make me",
+        "Oil and gas rise and collect at my crest",
+        "I am an arch-shaped fold"
+      ],
+      "answer": "Anticline",
+      "photoBrief": "Rock layers bent into an arch in a road cut or cliff",
+      "photo": "/media/photos/feature-13.jpg"
+    },
+    {
+      "id": "gf-14",
+      "balloon": 74,
+      "n": 14,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "Geologist James Hutton made me famous at Siccar Point in 1788",
+        "I mark millions of missing years",
+        "Tilted layers sit under flat layers across me"
+      ],
+      "answer": "Unconformity",
+      "photoBrief": "Tilted rock layers capped by flat-lying layers",
+      "photo": "/media/photos/feature-14.jpg"
+    },
+    {
+      "id": "gf-15",
+      "balloon": 75,
+      "n": 15,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I formed as lava cooled and cracked",
+        "My columns are mostly six-sided",
+        "The Giant's Causeway in Northern Ireland is made of me"
+      ],
+      "answer": "Columnar jointing",
+      "photoBrief": "Close-up of hexagonal basalt columns",
+      "photo": "/media/photos/feature-15.jpg"
+    },
+    {
+      "id": "gf-16",
+      "balloon": 76,
+      "n": 16,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I need hot rock, water and a narrow underground pipe",
+        "Old Faithful is the most famous one",
+        "I shoot hot water and steam into the air"
+      ],
+      "answer": "Geyser",
+      "photoBrief": "Erupting geyser with steam column",
+      "photo": "/media/photos/feature-16.jpg"
+    },
+    {
+      "id": "gf-17",
+      "balloon": 77,
+      "n": 17,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "Groundwater heated deep underground feeds me",
+        "Wikki in Yankari Game Reserve is a Nigerian example",
+        "You can swim in my warm, clear water"
+      ],
+      "answer": "Hot spring (warm spring)",
+      "photoBrief": "Clear spring pool, ideally Wikki Warm Spring",
+      "photo": "/media/photos/feature-17.jpg"
+    },
+    {
+      "id": "gf-18",
+      "balloon": 78,
+      "n": 18,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I am a slow-moving river of ice",
+        "I carve U-shaped valleys",
+        "I am melting fast as the climate warms"
+      ],
+      "answer": "Glacier",
+      "photoBrief": "Glacier flowing down a mountain valley",
+      "photo": "/media/photos/feature-18.jpg"
+    },
+    {
+      "id": "gf-19",
+      "balloon": 79,
+      "n": 19,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "Waves cut me off from the cliff I was once part of",
+        "I used to be part of a sea arch",
+        "Australia's Twelve Apostles are examples"
+      ],
+      "answer": "Sea stack",
+      "photoBrief": "Rock pillars standing in the sea off a cliff",
+      "photo": "/media/photos/feature-19.jpg"
+    },
+    {
+      "id": "gf-20",
+      "balloon": 80,
+      "n": 20,
+      "type": "feature",
+      "category": "Guess the Geological Feature",
+      "level": null,
+      "clues": [
+        "I record the direction ancient wind or water flowed",
+        "You see me as sloping lines inside a sandstone layer",
+        "I am the frozen face of an ancient dune or ripple"
+      ],
+      "answer": "Cross-bedding",
+      "photoBrief": "Sandstone cliff with angled internal layers (e.g. Zion, USA)",
+      "photo": "/media/photos/feature-20.jpg"
+    }
+  ]
+}

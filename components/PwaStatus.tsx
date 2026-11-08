@@ -37,13 +37,13 @@ export default function PwaStatus() {
       aria-live="polite"
       className={`pointer-events-none fixed bottom-2 left-2 z-[70] flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold shadow ${
         online
-          ? "bg-white/80 text-safety-green"
-          : "bg-ren-navy/85 text-warm-yellow"
+          ? "bg-white/80 text-ok"
+          : "bg-ink/85 text-sun"
       }`}
     >
       <span
         className={`h-2 w-2 rounded-full ${
-          online ? "bg-safety-green" : "bg-warm-yellow"
+          online ? "bg-ok" : "bg-sun"
         }`}
       />
       {online ? "Online" : "Offline Mode"}

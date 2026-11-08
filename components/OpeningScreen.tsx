@@ -5,6 +5,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import HowToPlay from "./HowToPlay";
 import { sound } from "@/lib/sound";
 import { BALLOON_COLORS } from "./Balloon";
+import { CATEGORIES } from "@/data/challenges";
+import Emblem from "./Emblem";
 
 function FloatingBalloons() {
   const reduced = useReducedMotion();
@@ -91,22 +93,34 @@ export default function OpeningScreen({
         transition={{ duration: 0.5 }}
         className="opening-content relative z-10 flex flex-col items-center text-center"
       >
-        <h1 className="hero-title font-black tracking-tight text-ren-navy">
-          POP THE <span className="text-ren-orange">BALLOON</span>
+        <Emblem className="mb-3 h-16 w-16 drop-shadow-lg lg:h-24 lg:w-24" />
+        <h1 className="hero-title font-black tracking-tight text-ink">
+          <span className="text-terra">NAPE 2026</span>
           <br />
-          CHALLENGE
+          GEOSCIENCE GAMES
         </h1>
-        <p className="mt-5 max-w-2xl text-lg font-semibold text-ren-navy/80 lg:text-xl">
-          Choose a balloon, answer the safety question and see whether you got
-          it right.
+        <p className="mt-5 max-w-3xl text-lg font-semibold text-ink/80 lg:text-2xl">
+          Pop a balloon, take on the challenge, and see whether you can think
+          like a geoscientist.
         </p>
+        <ul className="mt-5 flex flex-wrap items-center justify-center gap-2 lg:gap-3">
+          {CATEGORIES.map((c) => (
+            <li
+              key={c.id}
+              className="rounded-full px-4 py-1.5 text-base font-black shadow-panel lg:text-xl"
+              style={{ background: c.accentSoft, color: c.accent }}
+            >
+              {c.emoji} {c.name}
+            </li>
+          ))}
+        </ul>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:gap-4">
           {hasSavedGame && (
             <button
               type="button"
               onClick={onResume}
-              className={`${buttonBase} bg-safety-green text-white hover:bg-safety-green/90`}
+              className={`${buttonBase} bg-ok text-white hover:bg-ok/90`}
             >
               ▶ Resume Previous Game
             </button>
@@ -114,28 +128,28 @@ export default function OpeningScreen({
           <button
             type="button"
             onClick={onStart}
-            className={`${buttonBase} bg-ren-orange text-white hover:bg-ren-orange-deep`}
+            className={`${buttonBase} bg-terra text-white hover:bg-terra-deep`}
           >
             {hasSavedGame ? "Start New Game" : "Start Game"}
           </button>
           <button
             type="button"
             onClick={() => setShowHelp(true)}
-            className={`${buttonBase} bg-ren-navy text-white hover:bg-ren-navy-mid`}
+            className={`${buttonBase} bg-ink text-white hover:bg-ink-mid`}
           >
             How to Play
           </button>
           <button
             type="button"
             onClick={testSound}
-            className={`${buttonBase} bg-white text-ren-navy`}
+            className={`${buttonBase} bg-white text-ink`}
           >
             {soundTested ? "🔊 Sound OK" : "Sound Test"}
           </button>
           <button
             type="button"
             onClick={toggleFullscreen}
-            className={`${buttonBase} bg-white text-ren-navy`}
+            className={`${buttonBase} bg-white text-ink`}
           >
             ⛶ Full Screen
           </button>
@@ -143,7 +157,7 @@ export default function OpeningScreen({
             type="button"
             onClick={onAdmin}
             aria-label="Admin settings"
-            className={`${buttonBase} bg-white text-ren-navy`}
+            className={`${buttonBase} bg-white text-ink`}
           >
             ⚙ Admin
           </button>
