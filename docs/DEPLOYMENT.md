@@ -51,5 +51,7 @@ rehearsals.
 
 `npm run build` also runs `scripts/build-offline-manifest.mjs`, which writes
 `out/offline-manifest.json` (every file in the export) and stamps its version
-into `out/sw.js`. Keep the build command as `npm run build` on Vercel/Netlify
-so this step runs. See `docs/OFFLINE.md`.
+into `out/sw.js`. The repo's `vercel.json` pins Vercel's build command to
+`npm run build` so this step always runs (a plain `next build` would leave the
+service worker unstamped and offline mode disabled). On any other host, make
+sure the build command is `npm run build`. See `docs/OFFLINE.md`.
